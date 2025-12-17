@@ -12,9 +12,12 @@ export function MainWorkspace() {
   const [state, setState] = useState<WorkspaceState>("upload");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [result, setResult] = useState<GeminiResponse | null>(null);
+  const [historyId, setHistoryId] = useState<string | null>(null);
+  const [productInfo, setProductInfo] = useState<string>("");
 
   const handleStartAutopilot = async (image: string, productInfo: string) => {
     setUploadedImage(image);
+    setProductInfo(productInfo);
     setState("processing");
 
     try {
@@ -30,6 +33,24 @@ export function MainWorkspace() {
 
       const data = await response.json();
       setResult(data);
+
+      // Save to history
+      const historyResponse = await fetch("/api/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_image: image,
+          product_info: productInfo,
+          result: data,
+          generated_images: {},
+        }),
+      });
+
+      if (historyResponse.ok) {
+        const historyData = await historyResponse.json();
+        setHistoryId(historyData.data.id);
+      }
+
       setState("result");
     } catch (error) {
       console.error("[v0] Error analyzing product:", error);
@@ -41,6 +62,8 @@ export function MainWorkspace() {
     setState("upload");
     setUploadedImage(null);
     setResult(null);
+    setHistoryId(null);
+    setProductInfo("");
   };
 
   return (
@@ -54,6 +77,7 @@ export function MainWorkspace() {
           result={result}
           productImage={uploadedImage}
           onReset={handleReset}
+          historyId={historyId}
         />
       )}
     </div>

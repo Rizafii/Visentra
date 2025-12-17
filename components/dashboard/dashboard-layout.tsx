@@ -14,19 +14,22 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useRouter, usePathname } from "next/navigation";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true },
-  { icon: History, label: "Riwayat Generate", active: false },
-  { icon: Settings, label: "Pengaturan Akun", active: false },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/workspace" },
+  { icon: History, label: "Riwayat Generate", href: "/history" },
+  { icon: Settings, label: "Pengaturan Akun", href: "/settings" },
 ];
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -73,20 +76,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Navigation */}
           <nav className="flex-1 px-3 py-4 space-y-1">
-            {navItems.map((item) => (
-              <button
-                key={item.label}
-                className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                  item.active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                )}
-              >
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => {
+                    router.push(item.href);
+                    setSidebarOpen(false);
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  )}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
+                </button>
+              );
+            })}
           </nav>
 
           {/* Footer */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Package, CalendarDays, Lightbulb } from "lucide-react";
@@ -13,17 +13,32 @@ interface ResultDashboardProps {
   result: GeminiResponse;
   productImage: string;
   onReset: () => void;
+  historyId: string | null;
+  initialGeneratedImages?: Record<number, string>;
 }
 
 export function ResultDashboard({
   result,
   productImage,
   onReset,
+  historyId,
+  initialGeneratedImages,
 }: ResultDashboardProps) {
   const [activeTab, setActiveTab] = useState("analysis");
   const [generatedImages, setGeneratedImages] = useState<
     Record<number, string>
-  >({});
+  >(initialGeneratedImages || {});
+
+  // Update history when generated images change
+  useEffect(() => {
+    if (historyId && Object.keys(generatedImages).length > 0) {
+      fetch(`/api/history/${historyId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ generated_images: generatedImages }),
+      }).catch((error) => console.error("Error updating history:", error));
+    }
+  }, [generatedImages, historyId]);
 
   return (
     <div className="space-y-6">
