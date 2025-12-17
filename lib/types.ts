@@ -22,6 +22,8 @@ export interface BrandPersona {
 }
 
 export interface GeminiResponse {
+  nama_produk: string;
+  deskripsi_produk: string;
   kategori_produk: string;
   target_market: TargetMarket;
   selling_point: string[];

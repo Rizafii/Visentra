@@ -2,6 +2,76 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
+// Retry with exponential backoff
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      const isLastRetry = i === maxRetries - 1;
+      const isOverloaded =
+        error?.message?.includes("overloaded") ||
+        error?.message?.includes("503") ||
+        error?.message?.includes("429");
+
+      if (isLastRetry || !isOverloaded) {
+        throw error;
+      }
+
+      // Exponential backoff: 1s, 2s, 4s
+      const delay = baseDelay * Math.pow(2, i);
+      console.log(`Retry ${i + 1}/${maxRetries} after ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error("Max retries reached");
+}
+
+// Generate content with model fallback
+async function generateWithFallback(
+  base64Data: string,
+  mimeType: string,
+  prompt: string
+) {
+  const models = ["gemini-2.5-flash", "gemini-2.5-flash-preview-09-2025"];
+
+  for (let i = 0; i < models.length; i++) {
+    try {
+      console.log(`Trying model: ${models[i]}`);
+      const model = genAI.getGenerativeModel({ model: models[i] });
+
+      const result = await retryWithBackoff(async () => {
+        return await model.generateContent([
+          {
+            inlineData: {
+              data: base64Data,
+              mimeType: mimeType,
+            },
+          },
+          prompt,
+        ]);
+      });
+
+      return result;
+    } catch (error: any) {
+      console.error(`Model ${models[i]} failed:`, error.message);
+
+      const isLastModel = i === models.length - 1;
+      if (isLastModel) {
+        throw error;
+      }
+
+      console.log(`Falling back to ${models[i + 1]}...`);
+    }
+  }
+
+  throw new Error("All models failed");
+}
+
 export async function POST(request: Request) {
   try {
     const { image, productInfo } = await request.json();
@@ -26,6 +96,8 @@ export async function POST(request: Request) {
 ${productInfo ? `Informasi tambahan: ${productInfo}` : ""}
 
 Hasilkan output dalam format JSON terstruktur dengan field:
+- nama_produk (string)
+- deskripsi_produk (string)
 - kategori_produk (string)
 - target_market { usia (string, contoh: "18-35 tahun"), gender (string), segment (string) }
 - selling_point (array max 3 string)
@@ -38,17 +110,7 @@ Hasilkan output dalam format JSON terstruktur dengan field:
 Gunakan bahasa Indonesia yang profesional dan mudah dipahami UMKM.
 PENTING: Hanya output JSON valid tanpa markdown code blocks atau teks tambahan.`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          data: base64Data,
-          mimeType: mimeType,
-        },
-      },
-      prompt,
-    ]);
+    const result = await generateWithFallback(base64Data, mimeType, prompt);
 
     const response = await result.response;
     const text = response.text();
