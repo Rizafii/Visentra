@@ -5,21 +5,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Check, ImageIcon, Sparkles, Loader2 } from "lucide-react";
+import {
+  Copy,
+  Check,
+  ImageIcon,
+  Sparkles,
+  Loader2,
+  Download,
+} from "lucide-react";
 import type { ContentDay } from "@/lib/types";
 
 interface ContentPlanTabProps {
   contentPlan: ContentDay[];
+  generatedImages: Record<number, string>;
+  setGeneratedImages: React.Dispatch<
+    React.SetStateAction<Record<number, string>>
+  >;
 }
 
-export function ContentPlanTab({ contentPlan }: ContentPlanTabProps) {
+export function ContentPlanTab({
+  contentPlan,
+  generatedImages,
+  setGeneratedImages,
+}: ContentPlanTabProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [editedCaptions, setEditedCaptions] = useState<Record<number, string>>(
     {}
   );
-  const [generatedImages, setGeneratedImages] = useState<
-    Record<number, string>
-  >({});
   const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
 
@@ -32,6 +44,24 @@ export function ContentPlanTab({ contentPlan }: ContentPlanTabProps) {
     await navigator.clipboard.writeText(fullText);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const handleDownload = async (imageUrl: string, day: number) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `poster-hari-${day}.png`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error downloading image:", error);
+      alert("Gagal mendownload gambar");
+    }
   };
 
   const handleCaptionChange = (index: number, value: string) => {
@@ -224,20 +254,31 @@ export function ContentPlanTab({ contentPlan }: ContentPlanTabProps) {
                       alt={`Poster Hari ${day.hari}`}
                       className="w-full h-full object-cover"
                     />
-                    <Button
-                      size="sm"
-                      className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() =>
-                        handleGeneratePoster(
-                          index,
-                          getCaption(index, day.caption)
-                        )
-                      }
-                      disabled={generatingIndex === index}
-                    >
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Regenerate
-                    </Button>
+                    <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() =>
+                          handleDownload(generatedImages[index], day.hari)
+                        }
+                      >
+                        <Download className="w-3 h-3 mr-1" />
+                        Download
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          handleGeneratePoster(
+                            index,
+                            getCaption(index, day.caption)
+                          )
+                        }
+                        disabled={generatingIndex === index}
+                      >
+                        <Sparkles className="w-3 h-3 mr-1" />
+                        Regenerate
+                      </Button>
+                    </div>
                   </>
                 ) : (
                   <div className="text-center text-muted-foreground">
