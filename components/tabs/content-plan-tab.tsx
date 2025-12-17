@@ -15,6 +15,7 @@ import {
   DownloadCloud,
 } from "lucide-react";
 import type { ContentDay } from "@/lib/types";
+import JSZip from "jszip";
 
 interface ContentPlanTabProps {
   contentPlan: ContentDay[];
@@ -35,6 +36,7 @@ export function ContentPlanTab({
   );
   const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false);
 
   const handleCopy = async (
     text: string,
@@ -178,6 +180,62 @@ export function ContentPlanTab({
     alert(`Generate selesai!\nBerhasil: ${successCount}\nGagal: ${failCount}`);
   };
 
+  const handleDownloadAll = async () => {
+    // Check if there are any generated images
+    const generatedCount = Object.keys(generatedImages).length;
+    if (generatedCount === 0) {
+      alert(
+        "Belum ada poster yang di-generate. Generate poster terlebih dahulu."
+      );
+      return;
+    }
+
+    setIsDownloadingAll(true);
+    try {
+      const zip = new JSZip();
+
+      // Download all generated images and add to zip
+      for (const [indexStr, imageUrl] of Object.entries(generatedImages)) {
+        const index = parseInt(indexStr);
+        const day = contentPlan[index];
+
+        try {
+          // Download image
+          const imageResponse = await fetch(imageUrl);
+          const imageBlob = await imageResponse.blob();
+          zip.file(`poster-hari-${day.hari}.png`, imageBlob);
+
+          // Create caption text file
+          const caption = getCaption(index, day.caption);
+          const captionContent = `HARI ${
+            day.hari
+          }\n\n${caption}\n\n${day.hashtag.join(" ")}`;
+          zip.file(`caption-hari-${day.hari}.txt`, captionContent);
+        } catch (error) {
+          console.error(`Error processing day ${day.hari}:`, error);
+        }
+      }
+
+      // Generate and download zip
+      const content = await zip.generateAsync({ type: "blob" });
+      const url = window.URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `content-plan-${new Date().toISOString().split("T")[0]}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      alert(`Berhasil download ${generatedCount} poster dan caption!`);
+    } catch (error) {
+      console.error("Error downloading all assets:", error);
+      alert("Gagal mendownload aset. Silakan coba lagi.");
+    } finally {
+      setIsDownloadingAll(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <header className="flex w-full items-center justify-between">
@@ -191,9 +249,28 @@ export function ContentPlanTab({
         </div>
 
         <div className="cta flex items-center gap-4">
-          <Button size="lg" className="gap-2">
-            <DownloadCloud size={18} />
-            Download Semua Aset
+          <Button
+            size="lg"
+            className="gap-2"
+            onClick={handleDownloadAll}
+            disabled={
+              isDownloadingAll || Object.keys(generatedImages).length === 0
+            }
+            variant={
+              Object.keys(generatedImages).length === 0 ? "outline" : "default"
+            }
+          >
+            {isDownloadingAll ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Downloading...
+              </>
+            ) : (
+              <>
+                <DownloadCloud size={18} />
+                Download Semua Aset
+              </>
+            )}
           </Button>
           {/* Generate All Button */}
           <Button
@@ -261,7 +338,10 @@ export function ContentPlanTab({
                       alt={`Poster Hari ${day.hari}`}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                    <div
+                      className="absolute  opacity-0 group-hover:opacity-100 transition-opacity flex gap-2
+                    flex-col items-center justify-center"
+                    >
                       <Button
                         size="sm"
                         variant="secondary"
