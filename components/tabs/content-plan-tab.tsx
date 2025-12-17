@@ -12,6 +12,7 @@ import {
   Sparkles,
   Loader2,
   Download,
+  DownloadCloud,
 } from "lucide-react";
 import type { ContentDay } from "@/lib/types";
 
@@ -179,39 +180,45 @@ export function ContentPlanTab({
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-foreground">
-          Paket Konten 7 Hari
-        </h2>
-        <p className="text-muted-foreground text-sm mt-1">
-          Konten siap posting untuk seminggu penuh
-        </p>
-      </div>
+      <header className="flex w-full items-center justify-between">
+        <div className="flex flex-col items-start text-start">
+          <h2 className="text-xl font-bold text-foreground">
+            Paket Konten 7 Hari
+          </h2>
+          <p className="text-muted-foreground text-sm mt-1">
+            Konten siap posting untuk seminggu penuh
+          </p>
+        </div>
 
-      {/* Generate All Button */}
-      <div className="flex justify-center">
-        <Button
-          onClick={handleGenerateAllPosters}
-          disabled={isGeneratingAll || generatingIndex !== null}
-          size="lg"
-          className="gap-2"
-        >
-          {isGeneratingAll ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Generating{" "}
-              {generatingIndex !== null
-                ? `${(generatingIndex || 0) + 1}/${contentPlan.length}`
-                : "..."}
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4" />
-              Generate All Posters
-            </>
-          )}
-        </Button>
-      </div>
+        <div className="cta flex items-center gap-4">
+          <Button size="lg" className="gap-2">
+            <DownloadCloud size={18} />
+            Download Semua Aset
+          </Button>
+          {/* Generate All Button */}
+          <Button
+            onClick={handleGenerateAllPosters}
+            disabled={isGeneratingAll || generatingIndex !== null}
+            size="lg"
+            className="gap-2"
+          >
+            {isGeneratingAll ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Generating{" "}
+                {generatingIndex !== null
+                  ? `${(generatingIndex || 0) + 1}/${contentPlan.length}`
+                  : "..."}
+              </>
+            ) : (
+              <>
+                <Sparkles size={16} />
+                Generate Semua Poster
+              </>
+            )}
+          </Button>
+        </div>
+      </header>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {contentPlan.map((day, index) => (
