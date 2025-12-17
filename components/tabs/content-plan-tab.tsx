@@ -276,7 +276,7 @@ export function ContentPlanTab({ contentPlan }: ContentPlanTabProps) {
                 <Textarea
                   value={getCaption(index, day.caption)}
                   onChange={(e) => handleCaptionChange(index, e.target.value)}
-                  className="min-h-[100px] text-sm resize-none"
+                  className="min-h-25 text-sm resize-none"
                 />
               </div>
 

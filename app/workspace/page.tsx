@@ -1,12 +1,10 @@
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { MainWorkspace } from "@/components/dashboard/main-workspace";
-import Navbar from "@/components/homepage/Navbar";
-import Link from "next/link";
 
-export default function Home() {
+export default function workspace() {
   return (
-    <>
-      <Navbar />
-    </>
+    <DashboardLayout>
+      <MainWorkspace />
+    </DashboardLayout>
   );
 }
