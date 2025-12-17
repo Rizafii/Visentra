@@ -21,6 +21,7 @@ export function ContentPlanTab({ contentPlan }: ContentPlanTabProps) {
     Record<number, string>
   >({});
   const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
 
   const handleCopy = async (
     text: string,
@@ -86,6 +87,66 @@ export function ContentPlanTab({ contentPlan }: ContentPlanTabProps) {
     }
   };
 
+  const handleGenerateAllPosters = async () => {
+    setIsGeneratingAll(true);
+    const totalPosters = contentPlan.length;
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < totalPosters; i++) {
+      // Skip if already generated
+      if (generatedImages[i]) {
+        continue;
+      }
+
+      setGeneratingIndex(i);
+      try {
+        const caption = getCaption(i, contentPlan[i].caption);
+        const prompt = `Professional social media poster design for: ${caption}. Modern, vibrant, eye-catching design with clear text and attractive visuals`;
+
+        const response = await fetch("/api/generate-poster", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt,
+            width: 768,
+            height: 768,
+            steps: 8,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to generate poster");
+        }
+
+        const data = await response.json();
+
+        if (data.image || data.result_url || data.preview) {
+          const imageUrl = data.image || data.result_url || data.preview;
+          setGeneratedImages((prev) => ({ ...prev, [i]: imageUrl }));
+          successCount++;
+        } else {
+          throw new Error("No image URL received from API");
+        }
+      } catch (error) {
+        console.error(`Error generating poster ${i + 1}:`, error);
+        failCount++;
+      }
+
+      // Small delay between requests to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    setGeneratingIndex(null);
+    setIsGeneratingAll(false);
+
+    // Show summary
+    alert(`Generate selesai!\nBerhasil: ${successCount}\nGagal: ${failCount}`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -95,6 +156,31 @@ export function ContentPlanTab({ contentPlan }: ContentPlanTabProps) {
         <p className="text-muted-foreground text-sm mt-1">
           Konten siap posting untuk seminggu penuh
         </p>
+      </div>
+
+      {/* Generate All Button */}
+      <div className="flex justify-center">
+        <Button
+          onClick={handleGenerateAllPosters}
+          disabled={isGeneratingAll || generatingIndex !== null}
+          size="lg"
+          className="gap-2"
+        >
+          {isGeneratingAll ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Generating{" "}
+              {generatingIndex !== null
+                ? `${(generatingIndex || 0) + 1}/${contentPlan.length}`
+                : "..."}
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              Generate All Posters
+            </>
+          )}
+        </Button>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
