@@ -3,6 +3,12 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 // import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import { Inter, Poppins } from "next/font/google";
+const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+});
 
 export const metadata: Metadata = {
   title: "AI UMKM Autopilot - Strategi Marketing Otomatis",
@@ -12,19 +18,14 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
+        url: "/logo/primary.svg",
       },
       {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
+        url: "/logo/primary.svg",
         type: "image/svg+xml",
       },
     ],
-    apple: "/apple-icon.png",
+    apple: "/logo/primary.svg",
   },
 };
 
@@ -35,7 +36,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`font-sans antialiased`}>
+      <body
+        className={`${inter.className} ${poppins.className} font-sans antialiased`}
+      >
         {children}
         <Toaster richColors position="top-center" />
         {/* <Analytics /> */}
