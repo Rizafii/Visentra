@@ -23,7 +23,6 @@ interface DashboardLayoutProps {
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/workspace" },
   { icon: History, label: "Riwayat Generate", href: "/history" },
-  { icon: Settings, label: "Pengaturan Akun", href: "/settings" },
 ];
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {

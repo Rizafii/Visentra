@@ -1,24 +1,32 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Sparkles, Clock, MessageSquareQuote, Palette, Heart, Zap } from "lucide-react"
-import type { GeminiResponse } from "@/lib/types"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sparkles,
+  Clock,
+  MessageSquareQuote,
+  Palette,
+  Heart,
+  Zap,
+} from "lucide-react";
+import type { GeminiResponse } from "@/lib/types";
 
 interface BrandStrategyTabProps {
-  result: GeminiResponse
+  result: GeminiResponse;
 }
 
 export function BrandStrategyTab({ result }: BrandStrategyTabProps) {
-  const { brand_persona, waktu_posting_terbaik, key_message_brand } = result
+  const { brand_persona, waktu_posting_terbaik, key_message_brand } = result;
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
+      <header className="flex flex-col items-start text-start">
         <h2 className="text-xl font-bold text-foreground">Strategi Brand</h2>
-        <p className="text-muted-foreground text-sm mt-1">Panduan lengkap untuk membangun brand Anda</p>
-      </div>
-
+        <p className="text-muted-foreground text-sm mt-1">
+          Panduan lengkap untuk membangun brand Anda
+        </p>
+      </header>
       <div className="grid md:grid-cols-2 gap-6">
         {/* Brand Persona */}
         <Card className="md:col-span-2">
@@ -38,7 +46,9 @@ export function BrandStrategyTab({ result }: BrandStrategyTabProps) {
                   <Heart className="w-4 h-4" />
                   <span className="text-sm font-medium">Tone</span>
                 </div>
-                <p className="text-lg font-semibold text-foreground">{brand_persona.tone}</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {brand_persona.tone}
+                </p>
               </div>
 
               {/* Style */}
@@ -47,7 +57,9 @@ export function BrandStrategyTab({ result }: BrandStrategyTabProps) {
                   <Palette className="w-4 h-4" />
                   <span className="text-sm font-medium">Style</span>
                 </div>
-                <p className="text-lg font-semibold text-foreground">{brand_persona.style}</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {brand_persona.style}
+                </p>
               </div>
 
               {/* Karakter */}
@@ -56,7 +68,9 @@ export function BrandStrategyTab({ result }: BrandStrategyTabProps) {
                   <Zap className="w-4 h-4" />
                   <span className="text-sm font-medium">Karakter</span>
                 </div>
-                <p className="text-lg font-semibold text-foreground">{brand_persona.karakter}</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {brand_persona.karakter}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -76,12 +90,18 @@ export function BrandStrategyTab({ result }: BrandStrategyTabProps) {
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 {waktu_posting_terbaik.map((time, index) => (
-                  <Badge key={index} variant="secondary" className="text-base px-4 py-2 font-semibold">
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="text-base px-4 py-2 font-semibold"
+                  >
                     🕐 {time}
                   </Badge>
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground">Waktu optimal untuk menjangkau audiens target Anda</p>
+              <p className="text-sm text-muted-foreground">
+                Waktu optimal untuk menjangkau audiens target Anda
+              </p>
 
               {/* Visual Time Bar */}
               <div className="relative h-8 bg-muted rounded-full overflow-hidden">
@@ -91,8 +111,8 @@ export function BrandStrategyTab({ result }: BrandStrategyTabProps) {
                       key={i}
                       className={`flex-1 border-r border-background/20 ${
                         waktu_posting_terbaik.some((t) => {
-                          const hour = Number.parseInt(t.split(":")[0])
-                          return hour === i
+                          const hour = Number.parseInt(t.split(":")[0]);
+                          return hour === i;
                         })
                           ? "bg-primary"
                           : ""
@@ -124,11 +144,15 @@ export function BrandStrategyTab({ result }: BrandStrategyTabProps) {
           </CardHeader>
           <CardContent>
             <blockquote className="relative">
-              <div className="absolute -top-2 -left-2 text-4xl text-primary/20 font-serif">"</div>
+              <div className="absolute -top-2 -left-2 text-4xl text-primary/20 font-serif">
+                "
+              </div>
               <p className="text-lg font-medium text-foreground leading-relaxed pl-6 pr-4 py-4 bg-muted rounded-xl italic">
                 {key_message_brand}
               </p>
-              <div className="absolute -bottom-4 right-4 text-4xl text-primary/20 font-serif rotate-180">"</div>
+              <div className="absolute -bottom-4 right-4 text-4xl text-primary/20 font-serif rotate-180">
+                "
+              </div>
             </blockquote>
             <p className="text-sm text-muted-foreground mt-6">
               Gunakan pesan ini sebagai fondasi komunikasi brand Anda
@@ -137,5 +161,5 @@ export function BrandStrategyTab({ result }: BrandStrategyTabProps) {
         </Card>
       </div>
     </div>
-  )
+  );
 }

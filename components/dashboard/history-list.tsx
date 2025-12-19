@@ -5,6 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import {
   Calendar,
   Package,
   Trash2,
@@ -22,6 +33,8 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
   const [histories, setHistories] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [historyToDelete, setHistoryToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     fetchHistories();
@@ -41,24 +54,34 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
     }
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
+  const openDeleteDialog = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm("Hapus riwayat ini?")) return;
+    setHistoryToDelete(id);
+    setDeleteDialogOpen(true);
+  };
 
-    setDeletingId(id);
+  const handleDelete = async () => {
+    if (!historyToDelete) return;
+
+    setDeletingId(historyToDelete);
     try {
-      const response = await fetch(`/api/history/${id}`, {
+      const response = await fetch(`/api/history/${historyToDelete}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
-        setHistories(histories.filter((h) => h.id !== id));
+        setHistories(histories.filter((h) => h.id !== historyToDelete));
+        toast.success("Riwayat berhasil dihapus");
+      } else {
+        toast.error("Gagal menghapus riwayat");
       }
     } catch (error) {
       console.error("Error deleting history:", error);
-      alert("Gagal menghapus riwayat");
+      toast.error("Gagal menghapus riwayat");
     } finally {
       setDeletingId(null);
+      setDeleteDialogOpen(false);
+      setHistoryToDelete(null);
     }
   };
 
@@ -158,7 +181,7 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={(e) => handleDelete(history.id, e)}
+                  onClick={(e) => openDeleteDialog(history.id, e)}
                   disabled={deletingId === history.id}
                 >
                   {deletingId === history.id ? (
@@ -172,6 +195,27 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
           </Card>
         );
       })}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Riwayat?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Riwayat dan semua poster yang
+              telah di-generate akan dihapus secara permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
