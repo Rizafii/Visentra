@@ -38,22 +38,27 @@ export function ProductAnalysisTab({
             </div>
 
             {/* Product Info */}
-            <div className="flex-1 space-y-3">
-              <div>
+            <div className="flex-1 space-y-3 flex flex-col items-start min-w-0">
+              <div className="w-full">
                 <p className="text-xs text-muted-foreground mb-1">
                   Nama Produk
                 </p>
-                <p className="font-semibold text-sm">{result.nama_produk}</p>
+                <p className="font-semibold text-sm break-words">
+                  {result.nama_produk}
+                </p>
               </div>
-              <div>
+              <div className="w-full">
                 <p className="text-xs text-muted-foreground mb-1">Deskripsi</p>
-                <p className="text-sm text-foreground leading-relaxed">
+                <p className="text-sm text-foreground leading-relaxed break-words">
                   {result.deskripsi_produk}
                 </p>
               </div>
-              <div>
+              <div className="w-full">
                 <p className="text-xs text-muted-foreground mb-1">Kategori</p>
-                <Badge variant="secondary" className="text-sm px-3 py-1">
+                <Badge
+                  variant="secondary"
+                  className="text-sm px-3 py-1 break-words whitespace-normal text-left"
+                >
                   {result.kategori_produk}
                 </Badge>
               </div>

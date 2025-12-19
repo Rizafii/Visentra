@@ -155,8 +155,11 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
 
               {/* Info */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs break-words whitespace-normal text-left"
+                  >
                     {history.result.kategori_produk}
                   </Badge>
                   {posterCount > 0 && (
