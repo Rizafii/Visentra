@@ -35,9 +35,13 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
-          <Button size="lg">
-            Mulai Sekarang <ArrowRight size={18} strokeWidth={2} />
-          </Button>
+          <Link href="/workspace">
+            <Button size="lg" asChild>
+              <span className="flex items-center gap-2">
+                Mulai Sekarang <ArrowRight size={18} strokeWidth={2} />
+              </span>
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -16,9 +17,13 @@ export default function Hero() {
             membantu UMKM remaja membuat konten pemasaran secara otomatis,
             cepat, dan konsisten-tanpa perlu keahlian desain atau copywriting.
           </p>
-          <Button size="lg">
-            Mulai Sekarang <ArrowUpRight size={20} strokeWidth={3} />
-          </Button>
+          <Link href="/workspace">
+            <Button size="lg" asChild>
+              <span className="flex items-center gap-2">
+                Mulai Sekarang <ArrowUpRight size={20} strokeWidth={3} />
+              </span>
+            </Button>
+          </Link>
         </div>
         <Image
           alt="hero"
