@@ -4,6 +4,13 @@ import { supabase } from "@/lib/supabase";
 // Save history
 export async function POST(req: NextRequest) {
   try {
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Database not configured" },
+        { status: 503 }
+      );
+    }
+
     const body = await req.json();
     const { product_image, product_info, result, generated_images } = body;
 
@@ -35,6 +42,13 @@ export async function POST(req: NextRequest) {
 // Get all history
 export async function GET(req: NextRequest) {
   try {
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Database not configured" },
+        { status: 503 }
+      );
+    }
+
     const { data, error } = await supabase
       .from("history")
       .select("*")
