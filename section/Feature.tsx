@@ -127,19 +127,20 @@ export default function Feature() {
 
   return (
     <section className="w-full">
-      <div className="container mx-auto px-24 py-16">
+      <div className="container mx-auto lg:px-24 px-4 sm:px-6 py-12 lg:py-16">
         <div className="flex flex-col items-start gap-8">
-          <header className="flex items-center justify-between w-full">
-            <div className="left flex flex-col items-start gap-6">
-              <h2 className="text-5xl font-bold leading-15">
-                Brand<span className="text-primary">Force</span> <br />
+          <header className="flex flex-col-reverse lg:flex-row items-start lg:items-center justify-between w-full gap-8 lg:gap-0">
+            <div className="left flex flex-col items-start gap-6 flex-1">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+                Brand<span className="text-primary">Force</span>{" "}
+                <br className="hidden sm:block" />
                 Feature
               </h2>
-              <p className="max-w-120 font-medium text-lg leading-7 text-muted-foreground">
+              <p className="max-w-120 font-medium text-base sm:text-lg leading-7 text-muted-foreground">
                 Coba fitur BrandForce dan mulai bangun brand-mu dengan cara yang
                 simpel.
               </p>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                 {tabs.map((tab) => (
                   <Button
                     key={tab.id}
@@ -152,7 +153,7 @@ export default function Feature() {
                 ))}
               </div>
             </div>
-            <div className="right grid grid-cols-4 gap-4">
+            <div className="right hidden lg:grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 flex-1 w-full lg:w-auto mt-6 lg:mt-0">
               {currentContent.images.map((image, index) => (
                 <Image
                   key={index}
@@ -166,21 +167,21 @@ export default function Feature() {
             </div>
           </header>
           <div className="w-full">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {currentContent.features.map((feature, index) => (
                 <Card
                   key={index}
-                  className="p-6 hover:shadow-lg transition-shadow"
+                  className="p-5 sm:p-6 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex flex-col gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <feature.icon className="w-6 h-6 text-primary" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                     </div>
                     <div>
-                      <h4 className="text-xl font-semibold mb-2">
+                      <h4 className="text-lg sm:text-xl font-semibold mb-2">
                         {feature.title}
                       </h4>
-                      <p className="text-muted-foreground">
+                      <p className="text-muted-foreground text-sm sm:text-base">
                         {feature.description}
                       </p>
                     </div>
