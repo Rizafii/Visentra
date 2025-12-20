@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "AI UMKM Autopilot - Strategi Marketing Otomatis",
   description:
     "Dashboard AI untuk UMKM Indonesia yang menghasilkan strategi marketing otomatis dari satu foto produk menggunakan Gemini AI",
-  generator: "v0.app",
+  generator: "TSPJT",
   icons: {
     icon: [
       {
