@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 // import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
+import LenisProvider from "@/components/LenisProvider";
 const inter = Inter({ subsets: ["latin"] });
 const poppins = Poppins({
   subsets: ["latin"],
@@ -39,9 +40,11 @@ export default function RootLayout({
       <body
         className={`${inter.className} ${poppins.className} font-sans antialiased`}
       >
-        {children}
-        <Toaster richColors position="top-center" />
-        {/* <Analytics /> */}
+        <LenisProvider>
+          {children}
+          <Toaster richColors position="top-center" />
+          {/* <Analytics /> */}
+        </LenisProvider>
       </body>
     </html>
   );

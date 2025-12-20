@@ -8,11 +8,12 @@ import Feature from "@/section/Feature";
 import Hero from "@/section/Hero";
 import Stats from "@/section/Stats";
 import Testimoni from "@/section/Testimoni";
-import Link from "next/link";
+
+import ScrollToTop from "@/components/ui/ScrollToTop";
 
 export default function Home() {
   return (
-    <main className="overflow-hidden">
+    <main className="">
       <Navbar />
       <Hero />
       <Stats />
@@ -21,6 +22,7 @@ export default function Home() {
       <FAQ />
       <Banner />
       <Footer />
+      <ScrollToTop />
     </main>
   );
 }
