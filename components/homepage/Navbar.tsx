@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const menuItems = [
   { label: "Beranda", href: "" },
@@ -11,9 +14,30 @@ const menuItems = [
 ];
 
 export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <nav className="w-full  fixed">
-      <div className="container mx-auto px-24 flex items-center justify-between py-4">
+    <nav
+      className={`fixed top-0 left-0 right-0 transition-all duration-300 z-50 ${
+        isScrolled ? "px-42 pt-4" : "px-0 pt-0"
+      }`}
+    >
+      <div
+        className={`container mx-auto flex items-center justify-between transition-all duration-300 ${
+          isScrolled
+            ? "bg-white shadow-lg rounded-full py-2 px-8"
+            : "px-24 py-4 "
+        }`}
+      >
         <Link href="" className="brand">
           <Image
             src="/logo/logo.svg"
