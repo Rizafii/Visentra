@@ -105,7 +105,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="font-medium transition-colors hover:text-white"
             >
-              TSPJT
+              SMK NEGERI 6 SURAKARTA - YAMECH
             </a>
           </p>
           <div className="flex items-center gap-4 sm:gap-6">
