@@ -23,7 +23,7 @@ const socialMedia = [
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-primary">
+    <footer className="w-full" style={{ backgroundColor: "#1E2D5A" }}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-24 py-10 lg:py-16">
         <div className="grid grid-cols-1 gap-8 sm:gap-12 md:grid-cols-2 lg:grid-cols-3">
           {/* Brand Section */}
@@ -98,7 +98,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 lg:mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 lg:pt-8 md:flex-row">
           <p className="text-xs sm:text-sm text-white/60 text-center md:text-left">
-            © 2025 All Right Reserved by BrandForce AI -{" "}
+            © {new Date().getFullYear()} All Right Reserved by VISENTRA -{" "}
             <a
               href="https://instagram.com/mas_rizafii"
               target="_blank"
