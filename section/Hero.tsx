@@ -1,39 +1,123 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  Camera,
+  Video,
+  Palette,
+  ShoppingBag,
+  Megaphone,
+  Sparkles,
+  Smartphone,
+  Store
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="w-full pt-22">
-      <div className="container lg:gap-0 gap-12 mx-auto lg:px-24 px-6  py-26 lg:flex-row flex-col-reverse flex items-start lg:items-center justify-between">
-        <div className="content flex flex-col items-start gap-4">
-          <h1 className="font-extrabold font-poppins text-5xl lg:text-6xl leading-15 lg:leading-18 ">
-            Autopilot <span className="text-primary">Pemasaran</span>{" "}
-            <br className="hidden lg:flex" />
-            untuk UMKM Remaja
-          </h1>
-          <p className="max-w-160 font-medium lg:text-lg text-base leading-7">
-            VISENTRA adalah platform berbasis kecerdasan buatan yang
-            membantu UMKM remaja membuat konten pemasaran secara otomatis,
-            cepat, dan konsisten-tanpa perlu keahlian desain atau copywriting.
-          </p>
+    <section className="relative w-full overflow-hidden bg-[#F1F5F9] pt-20 pb-12 lg:pt-28 lg:pb-16">
+      {/* Decorative Background Icons */}
+      <div className="absolute inset-0 opacity-[0.15] text-gray-400 pointer-events-none select-none">
+        {/* Top Left */}
+        <div className="absolute top-[10%] left-[5%] rotate-[-15deg]">
+          <Camera size={72} strokeWidth={1} />
+        </div>
+        <div className="absolute top-[25%] left-[15%] rotate-[10deg]">
+          <Video size={56} strokeWidth={1} />
+        </div>
+
+        {/* Top Right */}
+        <div className="absolute top-[12%] right-[8%] rotate-[20deg]">
+          <Palette size={64} strokeWidth={1} />
+        </div>
+        <div className="absolute top-[30%] right-[18%] rotate-[-12deg]">
+          <ShoppingBag size={48} strokeWidth={1} />
+        </div>
+
+        {/* Bottom Left */}
+        <div className="absolute bottom-[20%] left-[10%] rotate-[15deg]">
+          <Megaphone size={52} strokeWidth={1} />
+        </div>
+        <div className="absolute bottom-[35%] left-[20%] rotate-[-25deg]">
+          <Sparkles size={40} strokeWidth={1} />
+        </div>
+
+        {/* Bottom Right */}
+        <div className="absolute bottom-[15%] right-[12%] rotate-[-10deg]">
+          <Smartphone size={60} strokeWidth={1} />
+        </div>
+        <div className="absolute bottom-[32%] right-[5%] rotate-[18deg]">
+          <Store size={48} strokeWidth={1} />
+        </div>
+      </div>
+
+      <div className="container relative z-10 mx-auto px-6 text-center">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-[#DDE7FF] mb-6">
+          <span className="text-sm font-semibold text-[#3B66D1]">Solusi cerdas untuk UMKM</span>
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold tracking-tight text-gray-900 mb-4 max-w-3xl mx-auto leading-tight font-dm-sans italic">
+          Bingung mulai bisnis? <br />
+          <span className="not-italic">Mulai dari sini</span>
+        </h1>
+
+        {/* Subheadline */}
+        <p className="text-base md:text-lg text-gray-600 font-medium mb-8 max-w-xl mx-auto leading-relaxed font-inter">
+          Dapet ide, strategi, foto produk, sampe <br className="hidden md:block" />
+          video promosi. Semua otomatis.
+        </p>
+
+        {/* CTA Button */}
+        <div className="flex justify-center mb-10">
           <Link href="/workspace">
-            <Button size="lg" asChild>
-              <span className="flex items-center gap-2">
-                Mulai Sekarang <ArrowUpRight size={20} strokeWidth={3} />
-              </span>
+            <Button size="lg" className="h-14 px-8 rounded-2xl bg-[#B87CFF] hover:bg-[#A666FF] text-white font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+              Mulai sekarang <ArrowUpRight className="w-6 h-6" />
             </Button>
           </Link>
         </div>
-        <Image
-          alt="hero"
-          src={"/hero/hero.png"}
-          width={500}
-          height={500}
-          className="lg:w-120 w-62 h-auto"
-        />
+
+        {/* Large Hero Image */}
+        <div className="relative w-full max-w-6xl mx-auto mb-12 px-4 group">
+          <div className="relative aspect-[21/9] w-full overflow-hidden rounded-[2rem]">
+            <Image
+              src="/hero/hero-main.png"
+              alt="BrandForceAI Dashboard"
+              fill
+              priority
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          {/* Floating decorative elements (Optional, can be removed) */}
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#B87CFF]/10 blur-3xl rounded-full" />
+          <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-blue-400/10 blur-3xl rounded-full" />
+        </div>
+
+        {/* Partner Logos */}
+        <div className="pt-20">
+          <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] mb-10 font-inter">Partnership by</p>
+          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-28 opacity-95 drop-shadow-md">
+            <Image src="/hero/logo/forum-umkm.svg" alt="Forum UMKM" width={400} height={400} className="object-contain h-28 md:h-36 w-auto" />
+            <Image src="/hero/logo/umkm-center.svg" alt="UMKM Center" width={400} height={400} className="object-contain h-28 md:h-36 w-auto" />
+            <Image src="/hero/logo/pemkot-surakarta.svg" alt="Pemkot" width={400} height={400} className="object-contain h-32 md:h-40 w-auto" />
+            <Image src="/hero/logo/umkm-soloraya.svg" alt="Soloraya" width={400} height={400} className="object-contain h-28 md:h-36 w-auto" />
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 4s ease-in-out infinite;
+        }
+      `}</style>
     </section>
   );
 }

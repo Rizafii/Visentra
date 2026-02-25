@@ -3,12 +3,17 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 // import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import { Inter, Poppins } from "next/font/google";
+import { Inter, DM_Sans } from "next/font/google";
 import LenisProvider from "@/components/LenisProvider";
-const inter = Inter({ subsets: ["latin"] });
-const poppins = Poppins({
+
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+  variable: "--font-inter",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
 });
 
 export const metadata: Metadata = {
@@ -38,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body
-        className={`${inter.className} ${poppins.className} font-sans antialiased`}
+        className={`${inter.variable} ${dmSans.variable} font-inter antialiased`}
       >
         <LenisProvider>
           {children}

@@ -11,7 +11,7 @@ export default function Banner() {
         className="absolute inset-0 h-full object-cover w-full"
       />
       <Image
-        src={"/logo/logo-white.svg"}
+        src={"/hero/logo/logo-white.svg"}
         alt="logo"
         width={500}
         height={500}

@@ -36,10 +36,11 @@
   --sidebar-accent-foreground: oklch(0.2101 0.0318 264.6645);
   --sidebar-border: oklch(0.9276 0.0058 264.5313);
   --sidebar-ring: oklch(0.6716 0.1368 48.513);
-  --font-sans: Geist Mono, ui-monospace, monospace;
+  --font-sans: var(--font-inter), sans-serif;
   --font-serif: serif;
   --font-mono: JetBrains Mono, monospace;
-  --font-inter: "Inter", sans-serif;
+  --font-inter: var(--font-inter), sans-serif;
+  --font-dm-sans: var(--font-dm-sans), sans-serif;
   --font-poppins: "Poppins", sans-serif;
   --radius: 0.75rem;
   --shadow-x: 0px;
@@ -161,6 +162,7 @@
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
   --font-inter: var(--font-inter);
+  --font-dm-sans: var(--font-dm-sans);
   --font-poppins: var(--font-poppins);
 
   --radius-sm: calc(var(--radius) - 4px);
