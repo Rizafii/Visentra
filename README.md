@@ -1,36 +1,163 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 VISENTRA
+Visual Intelligence System for Enterprise Network Transformation and Revenue Acceleration
 
-## Getting Started
+**KRENOVA Kota Surakarta 2026 SMK Negeri 6 Surakarta Tim A**
+**Bidang Fokus:** Teknologi Informasi dan Komunikasi
 
-First, run the development server:
+---
+
+**📌 Tentang VISENTRA**
+
+VISENTRA adalah platform berbasis Generative AI yang dirancang untuk membantu UMKM dalam mempercepat pembuatan konten visual, mengoptimalkan interaksi di media sosial, dan meningkatkan potensi pendapatan melalui wawasan berbasis data.
+
+Fitur utama:
+- Menghasilkan konten visual promosi otomatis
+- Membuat caption kontekstual berbasis AI
+- Menganalisis performa engagement
+- Memberikan prediksi interaksi mingguan–bulanan
+
+Platform ini dibangun menggunakan `Next.js` sebagai fullstack framework (Frontend + API Routes).
+
+---
+
+**🏗 Tech Stack**
+
+- `Next.js`
+- `React`
+- `Tailwind CSS`
+- `Node.js`
+- Integrasi `Generative AI` (OpenAI / model lain)
+- Cloud deployment ready (Vercel / VPS)
+
+---
+
+**📂 Struktur Project (ringkas)**
+
+- `/app` atau `/pages` → Routing
+- `/components` → Komponen reusable
+- `/public` → Static assets
+- `/styles` → Styling
+- `/pages/api` atau `/app/api` → Backend API Routes
+
+---
+
+**🛠 Cara Menjalankan Project (Development)**
+
+1. Clone repository
+
+```bash
+git clone https://github.com/elnoahcc/VISENTRA.git
+cd VISENTRA
+```
+
+2. Install dependencies
+
+```bash
+npm install
+```
+
+Jika koneksi lambat, tingkatkan percobaan unduhan:
+
+```bash
+npm config set fetch-retries 5
+```
+
+3. Jalankan development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka browser: `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**🔐 Environment Variables (Jika Ada)**
 
-## Learn More
+Buat file `.env.local` pada root project dan tambahkan variabel berikut jika diperlukan:
 
-To learn more about Next.js, take a look at the following resources:
+```
+OPENAI_API_KEY=your_api_key
+DATABASE_URL=your_database_url
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Jangan commit file `.env.local` ke repository publik.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+**🚀 Cara Deployment**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Karena menggunakan `Next.js`, cara paling mudah adalah menggunakan Vercel.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**🔵 Deployment via Vercel (Recommended)**
+
+1. Install Vercel CLI
+
+```bash
+npm install -g vercel
+```
+
+2. Login dan deploy
+
+```bash
+vercel login
+vercel
+```
+
+Untuk deploy production:
+
+```bash
+vercel --prod
+```
+
+Setiap push ke branch yang terhubung akan memicu auto-deploy jika diatur.
+
+**🟢 Deployment via VPS (Advanced)**
+
+1. Install `Node.js` pada server
+2. Clone repository
+3. `npm install`
+4. Build production: `npm run build`
+5. Start production: `npm start`
+
+Disarankan menggunakan `pm2` untuk manajemen proses:
+
+```bash
+npm install -g pm2
+pm2 start npm --name "visentra" -- start
+```
+
+---
+
+**📊 Status Kesiapan**
+
+- Technology Readiness Level: TRL 7–8
+- Prototype berjalan di lingkungan operasional
+- Siap menuju tahap komersialisasi dan skala nasional
+
+---
+
+**👨‍💻 Tim Pengembang**
+
+- Firmansyah Riza Afifudin
+- Elnoah Agustinus Markus Manalu
+- Narendra Fatin Fahrezi
+
+---
+
+**📈 Dampak Inovasi**
+
+- Efisiensi produksi konten >50%
+- Potensi peningkatan omzet hingga 26%
+- Akselerasi digitalisasi UMKM Indonesia
+
+---
+
+**📎 Lampiran**
+
+Video & dokumentasi: https://drive.google.com/drive/folders/1BrliN6_ehEm0t31ACZuJLTa31MZJb90s
+
+---
+
+Terima kasih — jika Anda ingin saya menambahkan badge, contoh screenshot, atau instruksi deployment CI/CD, beri tahu saya dan saya akan mengupdate `README.md`.
+
