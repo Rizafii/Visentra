@@ -29,7 +29,7 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="space-y-6">
             <Image
-              src="/logo/logo-white.svg"
+              src="/hero/logo/logo-white.svg"
               alt="Brand Logo"
               className="w-32 sm:w-40 lg:w-42"
               width={180}

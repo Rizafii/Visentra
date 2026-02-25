@@ -1,89 +1,162 @@
 "use client";
-import { ChevronDown } from "lucide-react";
+
+import { ChevronDown, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
-interface FAQItem {
-  question: string;
-  answer: string;
-}
-
-const faqData: FAQItem[] = [
+const faqData = [
   {
-    question: "Apa itu BrandForce AI?",
+    question: "Apa itu VISENTRA?",
     answer:
-      "BrandForce AI adalah platform berbasis kecerdasan buatan yang membantu UMKM dan bisnis dalam membangun, menganalisis, dan mengembangkan brand secara efisien. Dengan fitur analisis produk, strategi brand, dan pembuatan konten otomatis, BrandForce AI memudahkan proses branding dari awal hingga eksekusi.",
+      "VISENTRA adalah platform berbasis kecerdasan buatan (AI) yang membantu UMKM dan bisnis dalam membangun, menganalisis, dan mengembangkan brand secara efisien. Dengan fitur analisis produk, strategi brand, pembuatan konten otomatis, dan foto produk AI, VISENTRA memudahkan seluruh proses dari ide hingga eksekusi.",
   },
   {
-    question: "Bagaimana cara kerja BrandForce AI?",
+    question: "Bagaimana cara kerja VISENTRA?",
     answer:
-      "BrandForce AI menganalisis data produk, pasar, dan kompetitor menggunakan teknologi AI. Platform ini memberikan insight, rekomendasi strategi, serta membantu membuat konten pemasaran yang relevan dan efektif sesuai kebutuhan brand Anda.",
+      "VISENTRA menganalisis data produk, pasar, dan kompetitor menggunakan teknologi AI mutakhir. Platform ini kemudian memberikan insight, rekomendasi strategi, serta membantu membuat konten pemasaran yang relevan dan efektif — semuanya disesuaikan dengan kebutuhan brand kamu.",
   },
   {
-    question: "Apakah data saya aman di BrandForce AI?",
+    question: "Apakah data saya aman di VISENTRA?",
     answer:
-      "Keamanan data Anda adalah prioritas kami. BrandForce AI menggunakan enkripsi dan standar keamanan industri untuk melindungi seluruh data pengguna, serta tidak membagikan data ke pihak ketiga tanpa izin.",
+      "Keamanan data kamu adalah prioritas utama kami. VISENTRA menggunakan enkripsi end-to-end dan standar keamanan industri untuk melindungi seluruh data pengguna, serta tidak pernah membagikan data ke pihak ketiga tanpa izin eksplisit.",
   },
   {
-    question: "Apakah BrandForce AI berbayar?",
+    question: "Apakah VISENTRA berbayar?",
     answer:
-      "BrandForce AI menyediakan paket gratis dengan fitur dasar, serta paket premium untuk kebutuhan bisnis yang lebih kompleks. Anda dapat memilih paket sesuai kebutuhan dan meng-upgrade kapan saja.",
+      "VISENTRA menyediakan paket gratis dengan fitur dasar yang sudah cukup powerful untuk memulai bisnis. Untuk kebutuhan yang lebih kompleks, tersedia paket premium dengan fitur penuh. Kamu bisa meng-upgrade kapan saja tanpa kehilangan data sebelumnya.",
+  },
+  {
+    question: "Apakah saya perlu keahlian teknis untuk menggunakan VISENTRA?",
+    answer:
+      "Tidak sama sekali! VISENTRA dirancang khusus untuk pelaku UMKM yang tidak memiliki latar belakang teknis. Antarmuka yang intuitif dan panduan langkah demi langkah memastikan kamu bisa memaksimalkan semua fitur tanpa perlu training khusus.",
+  },
+  {
+    question: "Berapa lama hasilnya bisa terlihat?",
+    answer:
+      "Banyak pengguna VISENTRA sudah merasakan peningkatan signifikan dalam efisiensi operasional dan kualitas konten sejak minggu pertama penggunaan. Untuk peningkatan penjualan, rata-rata pengguna kami melaporkan hasil nyata dalam 30–60 hari pertama.",
   },
 ];
-export default function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const toggleAccordion = (index: number) => {
+export default function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const toggle = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <section className="w-full">
-      <div className="container mx-auto py-12 lg:py-16 px-4 sm:px-6 lg:px-24">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-          <div className="left flex flex-col flex-1 items-start text-start gap-4 mb-4 lg:mb-0">
-            <h4 className="text-2xl sm:text-4xl lg:text-6xl font-bold max-w-60 leading-tight lg:leading-[1.15]">
-              Frequenly Asked Question
-            </h4>
-            <p className="text-base sm:text-lg font-medium text-muted-foreground max-w-72 leading-6">
-              Jawaban cepat buat pertanyaan yang sering kamu tanyain
+    <section className="w-full bg-white relative overflow-hidden">
+
+      <div className="relative z-10 container mx-auto py-20 lg:py-28 px-6 lg:px-24 xl:px-40">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
+
+          {/* ── LEFT PANEL ── */}
+          <div className="flex flex-col gap-6 lg:sticky lg:top-28 lg:w-[340px] flex-shrink-0">
+            {/* Badge */}
+            <div className="inline-flex items-center px-5 py-1.5 rounded-full bg-[#DDE7FF] w-fit">
+              <span className="text-xs font-semibold text-[#3B66D1] uppercase tracking-widest">
+                FAQ
+              </span>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight font-dm-sans">
+              Pertanyaan yang{" "}
+              <span className="text-[#3B66D1]">sering ditanyakan</span>
+            </h2>
+
+            <p className="text-sm sm:text-base text-gray-500 leading-relaxed max-w-xs">
+              Belum nemu jawaban yang kamu cari? Hubungi tim kami langsung.
             </p>
-          </div>
-          {/* FAQ Accordion */}
-          <div className="flex flex-col gap-4 flex-2 w-full">
-            {faqData.map((faq, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-xl overflow-hidden bg-white hover:border-primary/30 transition-all duration-300"
-              >
+
+            {/* Contact card */}
+            <div className="mt-2 rounded-2xl bg-white border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-[#DDE7FF] flex items-center justify-center flex-shrink-0">
+                <MessageCircle size={18} className="text-[#3B66D1]" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Hubungi kami</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  support@visentra.id
+                </p>
+              </div>
+            </div>
+
+            {/* Progress indicator */}
+            <div className="hidden lg:flex items-center gap-2 mt-4">
+              {faqData.map((_, i) => (
                 <button
-                  onClick={() => toggleAccordion(index)}
-                  className="w-full flex items-center justify-between p-4 sm:p-6 text-left hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 pr-4">
-                    {faq.question}
-                  </h3>
-                  <ChevronDown
-                    className={`w-5 h-5 text-primary shrink-0 transition-transform duration-300 ${
-                      openIndex === index ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+                  key={i}
+                  onClick={() => toggle(i)}
+                  className="transition-all duration-300"
+                  style={{
+                    height: 4,
+                    borderRadius: 9999,
+                    backgroundColor: openIndex === i ? "#3B66D1" : "#CBD5E1",
+                    width: openIndex === i ? 28 : 12,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* ── RIGHT PANEL — Accordion ── */}
+          <div className="flex-1 flex flex-col gap-3 w-full">
+            {faqData.map((faq, index) => {
+              const isOpen = openIndex === index;
+              return (
                 <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    openIndex === index
-                      ? "max-h-96 opacity-100"
-                      : "max-h-0 opacity-0"
-                  }`}
+                  key={index}
+                  className={`rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen
+                    ? "border-[#3B66D1]/30 bg-white shadow-md"
+                    : "border-gray-200 bg-white hover:border-[#3B66D1]/20 hover:shadow-sm"
+                    }`}
                 >
-                  <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-2">
-                    <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
-                      {faq.answer}
-                    </p>
+                  <button
+                    onClick={() => toggle(index)}
+                    className="w-full flex items-center justify-between px-6 py-5 text-left group"
+                  >
+                    {/* Number + question */}
+                    <div className="flex items-center gap-4 pr-4">
+                      <span
+                        className={`text-xs font-bold tabular-nums transition-colors duration-200 ${isOpen ? "text-[#3B66D1]" : "text-gray-300"
+                          }`}
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 group-hover:text-[#3B66D1] transition-colors duration-200">
+                        {faq.question}
+                      </h3>
+                    </div>
+
+                    {/* Chevron */}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${isOpen
+                        ? "bg-[#3B66D1] text-white rotate-180"
+                        : "bg-gray-100 text-gray-400"
+                        }`}
+                    >
+                      <ChevronDown size={16} />
+                    </div>
+                  </button>
+
+                  {/* Answer panel */}
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
+                      }`}
+                  >
+                    {/* Left accent bar */}
+                    <div className="mx-6 mb-5 flex gap-4">
+                      <div className="w-0.5 rounded-full bg-[#3B66D1]/30 flex-shrink-0" />
+                      <p className="text-sm text-gray-500 leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
         </div>
       </div>
     </section>

@@ -8,6 +8,7 @@ import Feature from "@/section/Feature";
 import Hero from "@/section/Hero";
 import Stats from "@/section/Stats";
 import Testimoni from "@/section/Testimoni";
+import Pricing from "@/section/Pricing";
 
 import ScrollToTop from "@/components/ui/ScrollToTop";
 
@@ -19,6 +20,7 @@ export default function Home() {
       <Stats />
       <Feature />
       <Testimoni />
+      <Pricing />
       <FAQ />
       <Banner />
       <Footer />
