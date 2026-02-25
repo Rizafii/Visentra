@@ -14,7 +14,7 @@ export default function Hero() {
             untuk UMKM Remaja
           </h1>
           <p className="max-w-160 font-medium lg:text-lg text-base leading-7">
-            BrandForce AI adalah platform berbasis kecerdasan buatan yang
+            VISENTRA adalah platform berbasis kecerdasan buatan yang
             membantu UMKM remaja membuat konten pemasaran secara otomatis,
             cepat, dan konsisten-tanpa perlu keahlian desain atau copywriting.
           </p>
