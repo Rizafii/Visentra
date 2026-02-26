@@ -46,7 +46,7 @@ export default function FAQ() {
   return (
     <section className="w-full bg-white relative overflow-hidden">
 
-      <div className="relative z-10 container mx-auto py-20 lg:py-28 px-6 lg:px-24 xl:px-40">
+      <div className="relative z-10 container mx-auto py-16 lg:py-28 px-6 lg:px-24 xl:px-40">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
 
           {/* ── LEFT PANEL ── */}

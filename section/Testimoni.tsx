@@ -1,6 +1,7 @@
 "use client";
 
 import { Quote, Star } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 const testimonials = [
   {
@@ -52,8 +53,20 @@ function Stars({ count }: { count: number }) {
 }
 
 export default function Testimoni() {
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (carouselRef.current) {
+      const container = carouselRef.current;
+      if (window.innerWidth < 640) {
+        // Center the scroll position on mobile to show the middle items
+        container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+      }
+    }
+  }, []);
+
   return (
-    <section className="relative w-full overflow-hidden bg-white py-20 lg:py-28">
+    <section className="relative w-full overflow-hidden bg-white py-16 lg:py-28">
 
       <div className="relative z-10 container mx-auto px-6 lg:px-24 xl:px-40">
         {/* Header */}
@@ -72,45 +85,50 @@ export default function Testimoni() {
           </p>
         </div>
 
-        {/* 2×2 Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col gap-4"
-            >
-              {/* Quote icon */}
+        {/* Testimonials Carousel Wrapper */}
+        <div className="-mx-6 sm:mx-auto sm:max-w-3xl">
+          <div
+            ref={carouselRef}
+            className="flex sm:grid sm:grid-cols-2 overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-5 px-6 sm:px-0 pb-8 sm:pb-0 items-stretch [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          >
+            {testimonials.map((t, i) => (
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: `${t.accent}18` }}
+                key={i}
+                className="w-[85vw] sm:w-auto shrink-0 snap-center bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col gap-4"
               >
-                <Quote size={16} style={{ color: t.accent }} />
-              </div>
-
-              {/* Text */}
-              <p className="text-base font-semibold text-gray-800 leading-snug flex-1">
-                &ldquo;{t.text}&rdquo;
-              </p>
-
-              {/* Divider */}
-              <div className="h-px bg-gray-100" />
-
-              {/* Author */}
-              <div className="flex items-center gap-3">
+                {/* Quote icon */}
                 <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
-                  style={{ backgroundColor: t.accent }}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: `${t.accent}18` }}
                 >
-                  {t.initials}
+                  <Quote size={16} style={{ color: t.accent }} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm truncate">{t.name}</p>
-                  <p className="text-xs text-gray-400 truncate">{t.role}</p>
+
+                {/* Text */}
+                <p className="text-base font-semibold text-gray-800 leading-snug flex-1">
+                  &ldquo;{t.text}&rdquo;
+                </p>
+
+                {/* Divider */}
+                <div className="h-px bg-gray-100" />
+
+                {/* Author */}
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
+                    style={{ backgroundColor: t.accent }}
+                  >
+                    {t.initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 text-sm truncate">{t.name}</p>
+                    <p className="text-xs text-gray-400 truncate">{t.role}</p>
+                  </div>
+                  <Stars count={t.stars} />
                 </div>
-                <Stars count={t.stars} />
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Bottom stats */}

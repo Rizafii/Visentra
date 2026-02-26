@@ -19,7 +19,7 @@ export default function Hero() {
   return (
     <section className="relative w-full overflow-hidden bg-[#F1F5F9] pt-20 pb-12 lg:pt-28 lg:pb-16">
       {/* Decorative Background Icons */}
-      <div className="absolute inset-0 opacity-[0.15] text-gray-400 pointer-events-none select-none">
+      <div className="hidden md:block absolute inset-0 opacity-[0.15] text-gray-400 pointer-events-none select-none">
         {/* Top Left */}
         <div className="absolute top-[10%] left-[5%] rotate-[-15deg]">
           <Camera size={72} strokeWidth={1} />
@@ -81,30 +81,30 @@ export default function Hero() {
         </div>
 
         {/* Large Hero Image */}
-        <div className="relative w-full max-w-6xl mx-auto mb-12 px-4 group">
-          <div className="relative aspect-[21/9] w-full overflow-hidden rounded-[2rem]">
+        <div className="relative w-full max-w-6xl mx-auto mb-12 md:px-4 group overflow-visible">
+          <div className="relative w-[220%] sm:w-[150%] md:w-full left-1/2 -translate-x-1/2 aspect-[21/9] rounded-2xl ">
             <Image
               src="/hero/hero-main.png"
               alt="BrandForceAI Dashboard"
               fill
               priority
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              className="object-cover object-top md:object-center transition-transform duration-700 group-hover:scale-[1.02]"
             />
           </div>
 
           {/* Floating decorative elements (Optional, can be removed) */}
-          <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#B87CFF]/10 blur-3xl rounded-full" />
-          <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-blue-400/10 blur-3xl rounded-full" />
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#B87CFF]/10 blur-3xl rounded-full hidden md:block" />
+          <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-blue-400/10 blur-3xl rounded-full hidden md:block" />
         </div>
 
         {/* Partner Logos */}
-        <div className="pt-20">
+        <div className="pt-20 pb-10">
           <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-[0.3em] mb-10 font-inter">Partnership by</p>
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-28 opacity-95 drop-shadow-md">
-            <Image src="/hero/logo/forum-umkm.svg" alt="Forum UMKM" width={400} height={400} className="object-contain h-28 md:h-36 w-auto" />
-            <Image src="/hero/logo/umkm-center.svg" alt="UMKM Center" width={400} height={400} className="object-contain h-28 md:h-36 w-auto" />
-            <Image src="/hero/logo/pemkot-surakarta.svg" alt="Pemkot" width={400} height={400} className="object-contain h-32 md:h-40 w-auto" />
-            <Image src="/hero/logo/umkm-soloraya.svg" alt="Soloraya" width={400} height={400} className="object-contain h-28 md:h-36 w-auto" />
+          <div className="grid grid-cols-2 md:flex md:flex-wrap justify-items-center justify-center items-center gap-y-12 gap-x-6 md:gap-28 opacity-95 drop-shadow-md px-4">
+            <Image src="/hero/logo/forum-umkm.svg" alt="Forum UMKM" width={400} height={400} className="object-contain h-14 md:h-36 w-auto" />
+            <Image src="/hero/logo/umkm-center.svg" alt="UMKM Center" width={400} height={400} className="object-contain h-14 md:h-36 w-auto" />
+            <Image src="/hero/logo/pemkot-surakarta.svg" alt="Pemkot" width={400} height={400} className="object-contain h-16 md:h-40 w-auto" />
+            <Image src="/hero/logo/umkm-soloraya.svg" alt="Soloraya" width={400} height={400} className="object-contain h-14 md:h-36 w-auto" />
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 const plans = [
     {
@@ -51,8 +52,20 @@ const plans = [
 ];
 
 export default function Pricing() {
+    const carouselRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (carouselRef.current) {
+            const container = carouselRef.current;
+            if (window.innerWidth < 640) {
+                // Center the scroll position on mobile to show the middle card
+                container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+            }
+        }
+    }, []);
+
     return (
-        <section className="w-full bg-white py-20 lg:py-28 relative overflow-hidden">
+        <section className="w-full bg-white py-16 lg:py-28 relative overflow-hidden">
 
             <div className="relative z-10 container mx-auto px-6 lg:px-24 xl:px-40">
                 {/* Header */}
@@ -72,75 +85,80 @@ export default function Pricing() {
                     </p>
                 </div>
 
-                {/* Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-4xl mx-auto items-stretch">
-                    {plans.map((plan) => (
-                        <div
-                            key={plan.name}
-                            className={`relative flex flex-col rounded-2xl p-7 transition-all duration-300
+                {/* Cards Carousel Wrapper */}
+                <div className="-mx-6 sm:mx-auto sm:max-w-4xl">
+                    <div
+                        ref={carouselRef}
+                        className="flex sm:grid sm:grid-cols-3 overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-5 px-6 sm:px-0 pb-8 sm:pb-0 pt-4 sm:pt-0 items-stretch [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                    >
+                        {plans.map((plan) => (
+                            <div
+                                key={plan.name}
+                                className={`w-[85vw] sm:w-auto shrink-0 snap-center relative flex flex-col rounded-2xl p-7 transition-all duration-300
                 ${plan.dark
-                                    ? "bg-[#1E2D5A] text-white shadow-2xl scale-[1.03]"
-                                    : "bg-white text-gray-900 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1"
-                                }`}
-                        >
-                            {/* Name + badge */}
-                            <div className="flex items-center gap-2 mb-5">
-                                <h3 className={`font-bold text-lg ${plan.dark ? "text-white" : "text-gray-900"}`}>
-                                    {plan.name}
-                                </h3>
-                                {plan.badge && (
-                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#B87CFF] text-white">
-                                        {plan.badge}
+                                        ? "bg-[#1E2D5A] text-white shadow-xl md:scale-[1.03]"
+                                        : "bg-white text-gray-900 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1"
+                                    }`}
+                            >
+                                {/* Name + badge */}
+                                <div className="flex items-center gap-2 mb-5">
+                                    <h3 className={`font-bold text-lg ${plan.dark ? "text-white" : "text-gray-900"}`}>
+                                        {plan.name}
+                                    </h3>
+                                    {plan.badge && (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#B87CFF] text-white">
+                                            {plan.badge}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Price */}
+                                <div className="mb-6">
+                                    <span className={`text-3xl font-bold ${plan.dark ? "text-white" : "text-gray-900"}`}>
+                                        {plan.price}
                                     </span>
-                                )}
-                            </div>
+                                    <span className={`text-sm ml-1 ${plan.dark ? "text-white/60" : "text-gray-400"}`}>
+                                        {plan.period}
+                                    </span>
+                                </div>
 
-                            {/* Price */}
-                            <div className="mb-6">
-                                <span className={`text-3xl font-bold ${plan.dark ? "text-white" : "text-gray-900"}`}>
-                                    {plan.price}
-                                </span>
-                                <span className={`text-sm ml-1 ${plan.dark ? "text-white/60" : "text-gray-400"}`}>
-                                    {plan.period}
-                                </span>
-                            </div>
+                                {/* Perks */}
+                                <div className="mb-8">
+                                    <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${plan.dark ? "text-white/50" : "text-gray-400"}`}>
+                                        Keuntungan
+                                    </p>
+                                    <ul className="flex flex-col gap-2.5">
+                                        {plan.perks.map((perk) => (
+                                            <li key={perk} className="flex items-center gap-2.5">
+                                                <CheckCircle2
+                                                    size={16}
+                                                    className={plan.dark ? "text-[#B87CFF]" : "text-[#3B66D1]"}
+                                                />
+                                                <span className={`text-sm ${plan.dark ? "text-white/80" : "text-gray-600"}`}>
+                                                    {perk}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
 
-                            {/* Perks */}
-                            <div className="mb-8">
-                                <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${plan.dark ? "text-white/50" : "text-gray-400"}`}>
-                                    Keuntungan
-                                </p>
-                                <ul className="flex flex-col gap-2.5">
-                                    {plan.perks.map((perk) => (
-                                        <li key={perk} className="flex items-center gap-2.5">
-                                            <CheckCircle2
-                                                size={16}
-                                                className={plan.dark ? "text-[#B87CFF]" : "text-[#3B66D1]"}
-                                            />
-                                            <span className={`text-sm ${plan.dark ? "text-white/80" : "text-gray-600"}`}>
-                                                {perk}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* CTA */}
-                            <div className="mt-auto">
-                                <Link href={plan.href}>
-                                    <button
-                                        className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200
+                                {/* CTA */}
+                                <div className="mt-auto">
+                                    <Link href={plan.href}>
+                                        <button
+                                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200
                       ${plan.dark
-                                                ? "bg-white text-[#1E2D5A] hover:bg-gray-100"
-                                                : "border border-gray-200 text-gray-700 hover:border-[#3B66D1] hover:text-[#3B66D1]"
-                                            }`}
-                                    >
-                                        {plan.cta}
-                                    </button>
-                                </Link>
+                                                    ? "bg-white text-[#1E2D5A] hover:bg-gray-100"
+                                                    : "border border-gray-200 text-gray-700 hover:border-[#3B66D1] hover:text-[#3B66D1]"
+                                                }`}
+                                        >
+                                            {plan.cta}
+                                        </button>
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>

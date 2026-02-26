@@ -65,7 +65,7 @@ function FeatureCard({
 
       {/* ── DIALOG MODAL ── */}
       <DialogContent
-        className="max-w-3xl p-0 rounded-[2rem] border-none bg-white overflow-hidden"
+        className="max-w-3xl p-0 rounded-[2rem] border-none bg-white md:overflow-hidden max-h-[90vh] md:max-h-none overflow-y-auto w-[95vw] md:w-full"
         data-lenis-prevent
       >
         <div className="flex flex-col md:flex-row min-h-[400px] md:min-h-[440px]">
@@ -81,7 +81,7 @@ function FeatureCard({
           </div>
 
           {/* RIGHT — Feature details */}
-          <div className="flex-1 flex flex-col justify-center gap-5 p-7 md:p-8">
+          <div className="flex-1 flex flex-col justify-center gap-5 p-6 md:p-8 shrink-0">
 
             {/* Badge */}
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#DDE7FF] w-fit">
@@ -141,7 +141,7 @@ function FeatureCard({
 
 export default function Feature() {
   return (
-    <section className="w-full bg-[#F8FAFC] py-24">
+    <section className="w-full bg-[#F8FAFC] py-16 md:py-24">
       <div className="container mx-auto px-6 lg:px-24">
 
         {/* Header */}
