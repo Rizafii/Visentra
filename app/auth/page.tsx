@@ -63,7 +63,7 @@ export default function AuthPage() {
           toast.error(error.message || "Registrasi gagal");
         } else {
           toast.success(
-            "Registrasi berhasil! Silakan cek email untuk konfirmasi.",
+            "Registrasi berhasil! Silakan cek email untuk konfirmasi."
           );
           setIsLogin(true);
         }
@@ -178,13 +178,8 @@ export default function AuthPage() {
               alt="logo"
               width={500}
               height={500}
-              className="w-10 h-auto"
+              className="w-42 h-auto"
             />
-            <div>
-              <h1 className="text-lg font-bold">
-                Visentra <span className="text-primary">AI</span>
-              </h1>
-            </div>
           </div>
 
           <div className="text-center lg:text-left">
