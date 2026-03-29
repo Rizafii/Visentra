@@ -98,18 +98,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Logo */}
           <div className="flex items-center gap-1 px-6 py-5 border-b border-sidebar-border">
             <Image
-              src={"/logo/primary.svg"}
+              src={"/hero/logo/logo.svg"}
               alt="logo"
               width={500}
               height={500}
-              className="w-15 h-auto"
+              className="w-32 h-auto"
             />
-            <div>
-              <h1 className="font-semibold text-sidebar-foreground">
-                Visentra <span className="text-primary">AI</span>
-              </h1>
-              <p className="text-xs text-muted-foreground">UMKM Autopilot</p>
-            </div>
             <Button
               variant="ghost"
               size="icon"
@@ -193,12 +187,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           >
             <Menu className="w-5 h-5" />
           </Button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold">UMKM Autopilot</span>
-          </div>
+          <Image
+            src={"/hero/logo/logo.svg"}
+            alt="logo"
+            width={500}
+            height={500}
+            className="w-32 h-auto"
+          />
         </header>
 
         {/* Page Content */}

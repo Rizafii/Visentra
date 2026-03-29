@@ -25,14 +25,14 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/logo/primary.svg",
+        url: "/hero/logo/logo.svg",
       },
       {
-        url: "/logo/primary.svg",
+        url: "/hero/logo/logo.svg",
         type: "image/svg+xml",
       },
     ],
-    apple: "/logo/primary.svg",
+    apple: "/hero/logo/logo.svg",
   },
 };
 

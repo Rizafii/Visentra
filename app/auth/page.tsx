@@ -117,18 +117,12 @@ export default function AuthPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <Image
-              src="/logo/primary.svg"
+              src="/hero/logo/logo.svg"
               alt="logo"
               width={500}
               height={500}
-              className="w-12 h-auto"
+              className="w-56 h-auto "
             />
-            <div>
-              <h1 className="text-xl font-bold">
-                Visentra <span className="text-primary">AI</span>
-              </h1>
-              <p className="text-xs text-muted-foreground">UMKM Autopilot</p>
-            </div>
           </div>
         </div>
 
@@ -180,7 +174,7 @@ export default function AuthPage() {
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
             <Image
-              src="/logo/primary.svg"
+              src="/hero/logo/logo.svg"
               alt="logo"
               width={500}
               height={500}
