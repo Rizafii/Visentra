@@ -8,6 +8,7 @@ import { ProductAnalysisTab } from "@/components/tabs/product-analysis-tab";
 import { ContentPlanTab } from "@/components/tabs/content-plan-tab";
 import { BrandStrategyTab } from "@/components/tabs/brand-strategy-tab";
 import type { GeminiResponse } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 interface ResultDashboardProps {
   result: GeminiResponse;
@@ -32,11 +33,17 @@ export function ResultDashboard({
   // Update history when generated images change
   useEffect(() => {
     if (historyId && Object.keys(generatedImages).length > 0) {
-      fetch(`/api/history/${historyId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ generated_images: generatedImages }),
-      }).catch((error) => console.error("Error updating history:", error));
+      supabase?.auth.getSession().then(({ data: sessionData }) => {
+        const token = sessionData?.session?.access_token;
+        fetch(`/api/history/${historyId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ generated_images: generatedImages }),
+        }).catch((error) => console.error("Error updating history:", error));
+      });
     }
   }, [generatedImages, historyId]);
 

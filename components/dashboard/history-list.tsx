@@ -24,6 +24,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import type { HistoryRecord } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 interface HistoryListProps {
   onSelectHistory: (history: HistoryRecord) => void;
@@ -42,7 +43,14 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
 
   const fetchHistories = async () => {
     try {
-      const response = await fetch("/api/history");
+      const { data: sessionData } = (await supabase?.auth.getSession()) || {};
+      const token = sessionData?.session?.access_token;
+
+      const response = await fetch("/api/history", {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setHistories(data.data);
@@ -65,8 +73,14 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
 
     setDeletingId(historyToDelete);
     try {
+      const { data: sessionData } = (await supabase?.auth.getSession()) || {};
+      const token = sessionData?.session?.access_token;
+
       const response = await fetch(`/api/history/${historyToDelete}`, {
         method: "DELETE",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       });
 
       if (response.ok) {

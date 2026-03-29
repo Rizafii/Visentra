@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -30,9 +33,10 @@ export function ContentPlanTab({
   generatedImages,
   setGeneratedImages,
 }: ContentPlanTabProps) {
+  const router = useRouter();
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [editedCaptions, setEditedCaptions] = useState<Record<number, string>>(
-    {}
+    {},
   );
   const [generatingIndex, setGeneratingIndex] = useState<number | null>(null);
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
@@ -41,7 +45,7 @@ export function ContentPlanTab({
   const handleCopy = async (
     text: string,
     hashtags: string[],
-    index: number
+    index: number,
   ) => {
     const fullText = `${text}\n\n${hashtags.join(" ")}`;
     await navigator.clipboard.writeText(fullText);
@@ -63,7 +67,7 @@ export function ContentPlanTab({
       document.body.removeChild(a);
     } catch (error) {
       console.error("Error downloading image:", error);
-      alert("Gagal mendownload gambar");
+      toast.error("Gagal mendownload gambar");
     }
   };
 
@@ -78,6 +82,9 @@ export function ContentPlanTab({
   const handleGeneratePoster = async (index: number, caption: string) => {
     setGeneratingIndex(index);
     try {
+      const { data: sessionData } = (await supabase?.auth.getSession()) || {};
+      const token = sessionData?.session?.access_token;
+
       // Create prompt for poster generation
       const prompt = `Professional social media poster design for: ${caption}. Modern, vibrant, eye-catching design with clear text and attractive visuals`;
 
@@ -85,6 +92,7 @@ export function ContentPlanTab({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           prompt,
@@ -108,13 +116,26 @@ export function ContentPlanTab({
       } else {
         throw new Error("No image URL received from API");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating poster:", error);
-      alert(
-        `Gagal membuat poster: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      if (
+        errorMessage.includes("Pengaturan") ||
+        errorMessage.includes("konfigurasi")
+      ) {
+        toast.error("DeAPI Key Belum Dikonfigurasi", {
+          description:
+            "Silakan atur DeAPI Key terlebih dahulu untuk generate poster.",
+          action: {
+            label: "Pengaturan",
+            onClick: () => router.push("/settings"),
+          },
+        });
+      } else {
+        toast.error(`Gagal membuat poster: ${errorMessage}`);
+      }
     } finally {
       setGeneratingIndex(null);
     }
@@ -134,6 +155,9 @@ export function ContentPlanTab({
 
       setGeneratingIndex(i);
       try {
+        const { data: sessionData } = (await supabase?.auth.getSession()) || {};
+        const token = sessionData?.session?.access_token;
+
         const caption = getCaption(i, contentPlan[i].caption);
         const prompt = `Professional social media poster design for: ${caption}. Modern, vibrant, eye-catching design with clear text and attractive visuals`;
 
@@ -141,6 +165,7 @@ export function ContentPlanTab({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({
             prompt,
@@ -164,9 +189,25 @@ export function ContentPlanTab({
         } else {
           throw new Error("No image URL received from API");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Error generating poster ${i + 1}:`, error);
         failCount++;
+
+        const errorMessage = error instanceof Error ? error.message : "";
+        if (
+          errorMessage.includes("Pengaturan") ||
+          errorMessage.includes("konfigurasi")
+        ) {
+          toast.error("DeAPI Key Belum Dikonfigurasi", {
+            description:
+              "Silakan atur DeAPI Key terlebih dahulu untuk generate poster.",
+            action: {
+              label: "Pengaturan",
+              onClick: () => router.push("/settings"),
+            },
+          });
+          break; // Stop loop if the issue is a missing configuration
+        }
       }
 
       // Small delay between requests to avoid rate limiting
@@ -177,15 +218,24 @@ export function ContentPlanTab({
     setIsGeneratingAll(false);
 
     // Show summary
-    alert(`Generate selesai!\nBerhasil: ${successCount}\nGagal: ${failCount}`);
+    if (successCount > 0 || failCount > 0) {
+      toast(
+        successCount > 0 && failCount === 0
+          ? "Generate selesai!"
+          : "Generate selesai dengan catatan",
+        {
+          description: `Berhasil: ${successCount} | Gagal: ${failCount}`,
+        },
+      );
+    }
   };
 
   const handleDownloadAll = async () => {
     // Check if there are any generated images
     const generatedCount = Object.keys(generatedImages).length;
     if (generatedCount === 0) {
-      alert(
-        "Belum ada poster yang di-generate. Generate poster terlebih dahulu."
+      toast.info(
+        "Belum ada poster yang di-generate. Generate poster terlebih dahulu.",
       );
       return;
     }
@@ -227,10 +277,10 @@ export function ContentPlanTab({
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      alert(`Berhasil download ${generatedCount} poster dan caption!`);
+      toast.success(`Berhasil download ${generatedCount} poster dan caption!`);
     } catch (error) {
       console.error("Error downloading all assets:", error);
-      alert("Gagal mendownload aset. Silakan coba lagi.");
+      toast.error("Gagal mendownload aset. Silakan coba lagi.");
     } finally {
       setIsDownloadingAll(false);
     }
@@ -316,7 +366,7 @@ export function ContentPlanTab({
                     handleCopy(
                       getCaption(index, day.caption),
                       day.hashtag,
-                      index
+                      index,
                     )
                   }
                 >
@@ -357,7 +407,7 @@ export function ContentPlanTab({
                         onClick={() =>
                           handleGeneratePoster(
                             index,
-                            getCaption(index, day.caption)
+                            getCaption(index, day.caption),
                           )
                         }
                         disabled={generatingIndex === index}
@@ -383,7 +433,7 @@ export function ContentPlanTab({
                           onClick={() =>
                             handleGeneratePoster(
                               index,
-                              getCaption(index, day.caption)
+                              getCaption(index, day.caption),
                             )
                           }
                         >

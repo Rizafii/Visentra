@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { Inter, DM_Sans } from "next/font/google";
 import LenisProvider from "@/components/LenisProvider";
+import { AuthProvider } from "@/lib/auth-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,11 +46,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${dmSans.variable} font-inter antialiased`}
       >
-        <LenisProvider>
-          {children}
-          <Toaster richColors position="top-center" />
-          {/* <Analytics /> */}
-        </LenisProvider>
+        <AuthProvider>
+          <LenisProvider>
+            {children}
+            <Toaster richColors position="top-center" />
+            {/* <Analytics /> */}
+          </LenisProvider>
+        </AuthProvider>
       </body>
     </html>
   );

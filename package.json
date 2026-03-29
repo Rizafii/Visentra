@@ -1,5 +1,5 @@
 {
-  "name": "brandforce",
+  "name": "visentra",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -37,6 +37,7 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
+    "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.88.0",
     "ai": "^5.0.114",
     "class-variance-authority": "^0.7.1",

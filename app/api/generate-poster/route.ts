@@ -1,7 +1,10 @@
+import { getUserFromRequest, getUserApiKeys } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+
 async function checkRequestStatus(
   requestId: string,
   apiKey: string,
-  maxAttempts = 60
+  maxAttempts = 60,
 ): Promise<any> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const statusResponse = await fetch(
@@ -11,7 +14,7 @@ async function checkRequestStatus(
           accept: "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
-      }
+      },
     );
 
     if (!statusResponse.ok) {
@@ -36,6 +39,12 @@ async function checkRequestStatus(
 
 export async function POST(request: Request) {
   try {
+    // Authenticate user
+    const { userId, error: authError } = await getUserFromRequest(request);
+    if (authError || !userId) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const {
       prompt,
       width = 768,
@@ -47,10 +56,16 @@ export async function POST(request: Request) {
       return Response.json({ error: "No prompt provided" }, { status: 400 });
     }
 
-    if (!process.env.DEAPI_API_KEY) {
+    // Get user's DeAPI key from DB
+    const { deapi_api_key } = await getUserApiKeys(userId);
+
+    if (!deapi_api_key) {
       return Response.json(
-        { error: "DEAPI_API_KEY not configured" },
-        { status: 500 }
+        {
+          error:
+            "DeAPI Key belum dikonfigurasi. Silakan atur di halaman Pengaturan.",
+        },
+        { status: 400 },
       );
     }
 
@@ -60,7 +75,7 @@ export async function POST(request: Request) {
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.DEAPI_API_KEY}`,
+        Authorization: `Bearer ${deapi_api_key}`,
       },
       body: JSON.stringify({
         prompt,
@@ -78,7 +93,7 @@ export async function POST(request: Request) {
       console.error("DeAPI Error:", errorData);
       return Response.json(
         { error: "Failed to generate image from DeAPI" },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -88,21 +103,61 @@ export async function POST(request: Request) {
     if (!requestId) {
       return Response.json(
         { error: "No request_id received from DeAPI" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     // Step 2: Poll for completion
-    const result = await checkRequestStatus(
-      requestId,
-      process.env.DEAPI_API_KEY
-    );
+    const result = await checkRequestStatus(requestId, deapi_api_key);
+    const deapiUrl = result.result_url || result.preview;
+    let finalImageUrl = deapiUrl;
+
+    // Step 3: Download and Upload to Supabase Storage
+    const authHeader = request.headers.get("authorization");
+    if (authHeader && deapiUrl) {
+      try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+        const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+          global: {
+            headers: { Authorization: authHeader },
+          },
+        });
+
+        // Fetch image from DeAPI
+        const imageRes = await fetch(deapiUrl);
+        if (imageRes.ok) {
+          const imageBlob = await imageRes.blob();
+          const filename = `${userId}/${Date.now()}_${Math.random().toString(36).substring(7)}.png`;
+
+          const { data: uploadData, error: uploadError } =
+            await authSupabase.storage
+              .from("posters")
+              .upload(filename, imageBlob, {
+                contentType: "image/png",
+                upsert: false,
+              });
+
+          if (!uploadError && uploadData) {
+            const {
+              data: { publicUrl },
+            } = authSupabase.storage.from("posters").getPublicUrl(filename);
+            finalImageUrl = publicUrl;
+          } else {
+            console.error("Supabase Storage Upload Error:", uploadError);
+          }
+        }
+      } catch (storageError) {
+        console.error("Failed to upload image to Supabase:", storageError);
+      }
+    }
 
     return Response.json({
       success: true,
-      image: result.result_url || result.preview,
-      preview: result.preview,
-      result_url: result.result_url,
+      image: finalImageUrl,
+      preview: finalImageUrl,
+      result_url: finalImageUrl,
     });
   } catch (error) {
     console.error("Error generating poster:", error);
@@ -111,7 +166,7 @@ export async function POST(request: Request) {
         error:
           error instanceof Error ? error.message : "Failed to generate poster",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

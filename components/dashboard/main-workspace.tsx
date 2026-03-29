@@ -5,6 +5,9 @@ import { UploadWorkspace } from "@/components/dashboard/upload-workspace";
 import { ProcessingState } from "@/components/dashboard/processing-state";
 import { ResultDashboard } from "@/components/dashboard/result-dashboard";
 import type { GeminiResponse } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export type WorkspaceState = "upload" | "processing" | "result";
 
@@ -14,6 +17,7 @@ export function MainWorkspace() {
   const [result, setResult] = useState<GeminiResponse | null>(null);
   const [historyId, setHistoryId] = useState<string | null>(null);
   const [productInfo, setProductInfo] = useState<string>("");
+  const router = useRouter();
 
   const handleStartAutopilot = async (image: string, productInfo: string) => {
     setUploadedImage(image);
@@ -21,14 +25,21 @@ export function MainWorkspace() {
     setState("processing");
 
     try {
+      const { data: sessionData } = (await supabase?.auth.getSession()) || {};
+      const token = sessionData?.session?.access_token;
+
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ image, productInfo }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to analyze product");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to analyze product");
       }
 
       const data = await response.json();
@@ -37,7 +48,10 @@ export function MainWorkspace() {
       // Save to history
       const historyResponse = await fetch("/api/history", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           product_image: image,
           product_info: productInfo,
@@ -52,9 +66,26 @@ export function MainWorkspace() {
       }
 
       setState("result");
-    } catch (error) {
+    } catch (error: any) {
       console.error("[v0] Error analyzing product:", error);
       setState("upload");
+
+      const errorMessage = error.message || "Gagal menganalisis produk";
+
+      if (
+        errorMessage.includes("Pengaturan") ||
+        errorMessage.includes("konfigurasi")
+      ) {
+        toast.error("API Key Belum Dikonfigurasi", {
+          description: "Anda perlu mengatur Gemini API Key terlebih dahulu.",
+          action: {
+            label: "Buka Pengaturan",
+            onClick: () => router.push("/settings"),
+          },
+        });
+      } else {
+        toast.error(errorMessage);
+      }
     }
   };
 

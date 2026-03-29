@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase, getUserFromRequest } from "@/lib/supabase";
 
 // Save history
 export async function POST(req: NextRequest) {
@@ -7,8 +7,14 @@ export async function POST(req: NextRequest) {
     if (!supabase) {
       return NextResponse.json(
         { error: "Database not configured" },
-        { status: 503 }
+        { status: 503 },
       );
+    }
+
+    // Authenticate user
+    const { userId, error: authError } = await getUserFromRequest(req);
+    if (authError || !userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -21,6 +27,7 @@ export async function POST(req: NextRequest) {
         product_info,
         result,
         generated_images: generated_images || {},
+        user_id: userId,
       })
       .select()
       .single();
@@ -34,24 +41,31 @@ export async function POST(req: NextRequest) {
     console.error("Error saving history:", error);
     return NextResponse.json(
       { error: "Failed to save history" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-// Get all history
+// Get all history (filtered by user_id)
 export async function GET(req: NextRequest) {
   try {
     if (!supabase) {
       return NextResponse.json(
         { error: "Database not configured" },
-        { status: 503 }
+        { status: 503 },
       );
+    }
+
+    // Authenticate user
+    const { userId, error: authError } = await getUserFromRequest(req);
+    if (authError || !userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { data, error } = await supabase
       .from("history")
       .select("*")
+      .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -63,7 +77,7 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching history:", error);
     return NextResponse.json(
       { error: "Failed to fetch history" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

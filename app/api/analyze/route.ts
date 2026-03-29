@@ -1,12 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+import { getUserFromRequest, getUserApiKeys } from "@/lib/supabase";
 
 // Retry with exponential backoff
 async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  baseDelay: number = 1000
+  baseDelay: number = 1000,
 ): Promise<T> {
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -33,9 +32,10 @@ async function retryWithBackoff<T>(
 
 // Generate content with model fallback
 async function generateWithFallback(
+  genAI: GoogleGenerativeAI,
   base64Data: string,
   mimeType: string,
-  prompt: string
+  prompt: string,
 ) {
   const models = ["gemini-2.5-flash", "gemini-2.5-flash-preview-09-2025"];
 
@@ -74,18 +74,32 @@ async function generateWithFallback(
 
 export async function POST(request: Request) {
   try {
+    // Authenticate user
+    const { userId, error: authError } = await getUserFromRequest(request);
+    if (authError || !userId) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { image, productInfo } = await request.json();
 
     if (!image) {
       return Response.json({ error: "No image provided" }, { status: 400 });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    // Get user's API key from DB
+    const { gemini_api_key } = await getUserApiKeys(userId);
+
+    if (!gemini_api_key) {
       return Response.json(
-        { error: "GEMINI_API_KEY not configured" },
-        { status: 500 }
+        {
+          error:
+            "Gemini API Key belum dikonfigurasi. Silakan atur di halaman Pengaturan.",
+        },
+        { status: 400 },
       );
     }
+
+    const genAI = new GoogleGenerativeAI(gemini_api_key);
 
     // Extract base64 data from data URL
     const base64Data = image.split(",")[1];
@@ -110,7 +124,12 @@ Hasilkan output dalam format JSON terstruktur dengan field:
 Gunakan bahasa Indonesia yang profesional dan mudah dipahami UMKM.
 PENTING: Hanya output JSON valid tanpa markdown code blocks atau teks tambahan.`;
 
-    const result = await generateWithFallback(base64Data, mimeType, prompt);
+    const result = await generateWithFallback(
+      genAI,
+      base64Data,
+      mimeType,
+      prompt,
+    );
 
     const response = await result.response;
     const text = response.text();
@@ -124,7 +143,7 @@ PENTING: Hanya output JSON valid tanpa markdown code blocks atau teks tambahan.`
     console.error("Error analyzing product:", error);
     return Response.json(
       { error: "Failed to analyze product" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

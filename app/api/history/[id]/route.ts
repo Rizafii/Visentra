@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase, getUserFromRequest } from "@/lib/supabase";
 
-// Get single history by ID
+// Get single history by ID (user-scoped)
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     if (!supabase) {
       return NextResponse.json(
         { error: "Database not configured" },
-        { status: 503 }
+        { status: 503 },
       );
+    }
+
+    const { userId, error: authError } = await getUserFromRequest(req);
+    if (authError || !userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -20,6 +25,7 @@ export async function GET(
       .from("history")
       .select("*")
       .eq("id", id)
+      .eq("user_id", userId)
       .single();
 
     if (error) {
@@ -31,22 +37,27 @@ export async function GET(
     console.error("Error fetching history:", error);
     return NextResponse.json(
       { error: "Failed to fetch history" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-// Update history (e.g., add generated images)
+// Update history (user-scoped)
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     if (!supabase) {
       return NextResponse.json(
         { error: "Database not configured" },
-        { status: 503 }
+        { status: 503 },
       );
+    }
+
+    const { userId, error: authError } = await getUserFromRequest(req);
+    if (authError || !userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -56,6 +67,7 @@ export async function PATCH(
       .from("history")
       .update(body)
       .eq("id", id)
+      .eq("user_id", userId)
       .select()
       .single();
 
@@ -68,27 +80,36 @@ export async function PATCH(
     console.error("Error updating history:", error);
     return NextResponse.json(
       { error: "Failed to update history" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-// Delete history
+// Delete history (user-scoped)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     if (!supabase) {
       return NextResponse.json(
         { error: "Database not configured" },
-        { status: 503 }
+        { status: 503 },
       );
+    }
+
+    const { userId, error: authError } = await getUserFromRequest(req);
+    if (authError || !userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
 
-    const { error } = await supabase.from("history").delete().eq("id", id);
+    const { error } = await supabase
+      .from("history")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId);
 
     if (error) {
       throw error;
@@ -99,7 +120,7 @@ export async function DELETE(
     console.error("Error deleting history:", error);
     return NextResponse.json(
       { error: "Failed to delete history" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
