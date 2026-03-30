@@ -157,7 +157,4 @@ pm2 start npm --name "visentra" -- start
 
 Video & dokumentasi: https://drive.google.com/drive/folders/1BrliN6_ehEm0t31ACZuJLTa31MZJb90s
 
----
-
-Terima kasih — jika Anda ingin saya menambahkan badge, contoh screenshot, atau instruksi deployment CI/CD, beri tahu saya dan saya akan mengupdate `README.md`.
 
