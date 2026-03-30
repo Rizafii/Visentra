@@ -81,20 +81,21 @@ export default function Hero() {
         </div>
 
         {/* Large Hero Image */}
-        <div className="relative w-full max-w-6xl mx-auto mb-12 md:px-4 group overflow-visible">
-          <div className="relative w-[220%] sm:w-[150%] md:w-full left-1/2 -translate-x-1/2 aspect-[21/9] rounded-2xl ">
+        <div className="relative w-[100vw] left-1/2 -translate-x-1/2 lg:w-full lg:static lg:translate-x-0 max-w-6xl mx-auto mb-12 lg:px-4 flex justify-center overflow-hidden lg:overflow-visible">
+          <div className="relative w-full max-w-[1400px]">
             <Image
               src="/hero/hero-main.png"
               alt="BrandForceAI Dashboard"
-              fill
+              width={1400}
+              height={600}
               priority
-              className="object-cover object-top md:object-center transition-transform duration-700 group-hover:scale-[1.02]"
+              className="w-full h-auto object-contain transition-transform duration-700"
             />
           </div>
 
           {/* Floating decorative elements (Optional, can be removed) */}
-          <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#B87CFF]/10 blur-3xl rounded-full hidden md:block" />
-          <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-blue-400/10 blur-3xl rounded-full hidden md:block" />
+          <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#B87CFF]/10 blur-3xl rounded-full hidden lg:block -z-10" />
+          <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-blue-400/10 blur-3xl rounded-full hidden lg:block -z-10" />
         </div>
 
         {/* Partner Logos */}

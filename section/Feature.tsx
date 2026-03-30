@@ -164,7 +164,7 @@ export default function Feature() {
           {/* Left Column */}
           <div className="flex flex-col gap-8">
             <FeatureCard
-              image="https://images.unsplash.com/photo-1551288049-bbbda536ad37?q=80&w=2070&auto=format&fit=crop"
+              image="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?q=80&w=2070&auto=format&fit=crop"
               title="Artificial Intelligence"
               description="AI membantu bisnismu jadi lebih terarah dan kamu bisa auto pilot bisnis kamu"
               featureTitle="AI Strategi bisnis"
