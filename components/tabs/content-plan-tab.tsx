@@ -16,9 +16,12 @@ import {
   Loader2,
   Download,
   DownloadCloud,
+  CalendarDays,
+  Wand2,
 } from "lucide-react";
 import type { ContentDay } from "@/lib/types";
 import JSZip from "jszip";
+import { cn } from "@/lib/utils";
 
 interface ContentPlanTabProps {
   contentPlan: ContentDay[];
@@ -85,7 +88,6 @@ export function ContentPlanTab({
       const { data: sessionData } = (await supabase?.auth.getSession()) || {};
       const token = sessionData?.session?.access_token;
 
-      // Create prompt for poster generation
       const prompt = `Professional social media poster design for: ${caption}. Modern, vibrant, eye-catching design with clear text and attractive visuals`;
 
       const response = await fetch("/api/generate-poster", {
@@ -109,7 +111,6 @@ export function ContentPlanTab({
 
       const data = await response.json();
 
-      // Use result_url or preview from the API response
       if (data.image || data.result_url || data.preview) {
         const imageUrl = data.image || data.result_url || data.preview;
         setGeneratedImages((prev) => ({ ...prev, [index]: imageUrl }));
@@ -148,10 +149,7 @@ export function ContentPlanTab({
     let failCount = 0;
 
     for (let i = 0; i < totalPosters; i++) {
-      // Skip if already generated
-      if (generatedImages[i]) {
-        continue;
-      }
+      if (generatedImages[i]) continue;
 
       setGeneratingIndex(i);
       try {
@@ -206,18 +204,16 @@ export function ContentPlanTab({
               onClick: () => router.push("/settings"),
             },
           });
-          break; // Stop loop if the issue is a missing configuration
+          break;
         }
       }
 
-      // Small delay between requests to avoid rate limiting
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     setGeneratingIndex(null);
     setIsGeneratingAll(false);
 
-    // Show summary
     if (successCount > 0 || failCount > 0) {
       toast(
         successCount > 0 && failCount === 0
@@ -231,7 +227,6 @@ export function ContentPlanTab({
   };
 
   const handleDownloadAll = async () => {
-    // Check if there are any generated images
     const generatedCount = Object.keys(generatedImages).length;
     if (generatedCount === 0) {
       toast.info(
@@ -244,29 +239,23 @@ export function ContentPlanTab({
     try {
       const zip = new JSZip();
 
-      // Download all generated images and add to zip
       for (const [indexStr, imageUrl] of Object.entries(generatedImages)) {
         const index = parseInt(indexStr);
         const day = contentPlan[index];
 
         try {
-          // Download image
           const imageResponse = await fetch(imageUrl);
           const imageBlob = await imageResponse.blob();
           zip.file(`poster-hari-${day.hari}.png`, imageBlob);
 
-          // Create caption text file
           const caption = getCaption(index, day.caption);
-          const captionContent = `HARI ${
-            day.hari
-          }\n\n${caption}\n\n${day.hashtag.join(" ")}`;
+          const captionContent = `HARI ${day.hari}\n\n${caption}\n\n${day.hashtag.join(" ")}`;
           zip.file(`caption-hari-${day.hari}.txt`, captionContent);
         } catch (error) {
           console.error(`Error processing day ${day.hari}:`, error);
         }
       }
 
-      // Generate and download zip
       const content = await zip.generateAsync({ type: "blob" });
       const url = window.URL.createObjectURL(content);
       const a = document.createElement("a");
@@ -287,21 +276,32 @@ export function ContentPlanTab({
   };
 
   return (
-    <div className="space-y-6">
-      <header className="flex w-full items-center justify-between">
-        <div className="flex flex-col items-start text-start">
-          <h2 className="text-xl font-bold text-foreground">
-            Paket Konten 7 Hari
+    <div className="space-y-8 animate-in fade-in zoom-in-95 duration-700">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border/50 pb-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/20 rounded-full blur-[4rem] pointer-events-none" />
+        <div className="flex flex-col items-start text-start z-10">
+          <Badge
+            variant="outline"
+            className="bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/30 px-3 py-1 mb-3 rounded-full font-medium"
+          >
+            <CalendarDays className="w-4 h-4 mr-2" /> Weekly Content Schedule
+          </Badge>
+          <h2 className="text-3xl font-extrabold text-foreground tracking-tight flex items-center gap-3">
+            Paket{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-500">
+              Konten 7 Hari
+            </span>
           </h2>
-          <p className="text-muted-foreground text-sm mt-1">
-            Konten siap posting untuk seminggu penuh
+          <p className="text-muted-foreground text-lg mt-2 font-medium max-w-xl">
+            Dari caption, hashtags, hingga visual poster, semuanya disiapkan AI
+            khusus untuk produk Anda.
           </p>
         </div>
 
-        <div className="cta flex items-center gap-4">
+        <div className="cta flex flex-wrap items-center gap-3 z-10 w-full md:w-auto">
           <Button
             size="lg"
-            className="gap-2"
+            className="flex-1 md:flex-none gap-2 rounded-xl transition-all font-bold group"
             onClick={handleDownloadAll}
             disabled={
               isDownloadingAll || Object.keys(generatedImages).length === 0
@@ -312,56 +312,70 @@ export function ContentPlanTab({
           >
             {isDownloadingAll ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Downloading...
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Mengunduh...
               </>
             ) : (
               <>
-                <DownloadCloud size={18} />
-                Download Semua Aset
+                <DownloadCloud
+                  size={20}
+                  className="group-hover:-translate-y-1 transition-transform"
+                />
+                Unduh Semua
               </>
             )}
           </Button>
-          {/* Generate All Button */}
           <Button
             onClick={handleGenerateAllPosters}
             disabled={isGeneratingAll || generatingIndex !== null}
             size="lg"
-            className="gap-2"
+            className="flex-1 md:flex-none gap-2 rounded-xl font-bold bg-gradient-to-r from-primary to-amber-500 hover:from-primary/90 hover:to-amber-500/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all group border-0"
           >
             {isGeneratingAll ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Generating{" "}
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Generating...{" "}
                 {generatingIndex !== null
                   ? `${(generatingIndex || 0) + 1}/${contentPlan.length}`
-                  : "..."}
+                  : ""}
               </>
             ) : (
               <>
-                <Sparkles size={16} />
-                Generate Semua Poster
+                <Wand2
+                  size={20}
+                  className="group-hover:rotate-12 transition-transform"
+                />
+                Auto Generate 7 Poster
               </>
             )}
           </Button>
         </div>
       </header>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {contentPlan.map((day, index) => (
-          <Card key={index} className="flex flex-col">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+          <Card
+            key={index}
+            className="flex flex-col border-0 shadow-xl bg-card rounded-[2rem] overflow-hidden group hover:shadow-2xl transition-all duration-300 relative border-t-2 border-t-transparent hover:border-t-primary/50"
+          >
+            <div className="absolute inset-x-0 -top-full h-full bg-gradient-to-b from-primary/5 to-transparent transition-all duration-500 ease-out group-hover:top-0 pointer-events-none" />
+            <CardHeader className="pb-4 bg-muted/30 border-b border-border/30 relative z-10">
+              <CardTitle className="text-base flex items-center justify-between font-extrabold tracking-tight">
+                <span className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-primary shadow-md shadow-primary/20 text-primary-foreground text-sm font-black flex items-center justify-center">
                     {day.hari}
                   </span>
-                  Hari {day.hari}
+                  Hari Ke-{day.hari}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
+                  className={cn(
+                    "h-9 w-9 rounded-full transition-colors",
+                    copiedIndex === index
+                      ? "bg-green-500/10 hover:bg-green-500/20"
+                      : "bg-muted hover:bg-muted/80",
+                  )}
                   onClick={() =>
                     handleCopy(
                       getCaption(index, day.caption),
@@ -371,36 +385,34 @@ export function ContentPlanTab({
                   }
                 >
                   {copiedIndex === index ? (
-                    <Check className="w-4 h-4 text-green-500" />
+                    <Check className="w-5 h-5 text-green-500" />
                   ) : (
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                   )}
                 </Button>
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col gap-3">
+            <CardContent className="flex-1 flex flex-col gap-5 p-6 relative z-10 bg-gradient-to-b from-transparent to-muted/20">
               {/* Visual Placeholder / Generated Image */}
-              <div className="aspect-square rounded-xl bg-muted flex items-center justify-center relative overflow-hidden group">
+              <div className="aspect-square rounded-[1.5rem] bg-muted/50 flex items-center justify-center relative overflow-hidden group/image border border-border/50 shadow-inner">
                 {generatedImages[index] ? (
                   <>
                     <img
                       src={generatedImages[index]}
                       alt={`Poster Hari ${day.hari}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover/image:scale-110"
                     />
-                    <div
-                      className="absolute  opacity-0 group-hover:opacity-100 transition-opacity flex gap-2
-                    flex-col items-center justify-center"
-                    >
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-md opacity-0 group-hover/image:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-3">
                       <Button
                         size="sm"
                         variant="secondary"
                         onClick={() =>
                           handleDownload(generatedImages[index], day.hari)
                         }
+                        className="rounded-full gap-2 font-bold hover:scale-105 transition-transform w-[140px]"
                       >
-                        <Download className="w-3 h-3 mr-1" />
-                        Download
+                        <Download className="w-4 h-4" />
+                        Unduh
                       </Button>
                       <Button
                         size="sm"
@@ -411,25 +423,38 @@ export function ContentPlanTab({
                           )
                         }
                         disabled={generatingIndex === index}
+                        className="rounded-full gap-2 font-bold hover:scale-105 transition-transform w-[140px] bg-primary"
                       >
-                        <Sparkles className="w-3 h-3 mr-1" />
+                        <Sparkles className="w-4 h-4" />
                         Regenerate
                       </Button>
                     </div>
                   </>
                 ) : (
-                  <div className="text-center text-muted-foreground">
+                  <div className="text-center w-full h-full flex flex-col items-center justify-center p-6 text-muted-foreground relative">
+                    <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent pointer-events-none" />
                     {generatingIndex === index ? (
                       <>
-                        <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin" />
-                        <p className="text-xs">Membuat poster...</p>
+                        <div className="relative w-16 h-16 mb-4">
+                          <div className="absolute inset-0 border-4 border-muted rounded-full"></div>
+                          <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                          <Wand2 className="w-6 h-6 absolute inset-0 m-auto text-primary animate-pulse" />
+                        </div>
+                        <p className="text-sm font-bold text-foreground animate-pulse">
+                          Membuat Poster AI...
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 text-center">
+                          Tunggu sekitar 15-20 detik
+                        </p>
                       </>
                     ) : (
                       <>
-                        <ImageIcon className="w-8 h-8 mx-auto mb-2" />
+                        <div className="w-16 h-16 rounded-full bg-background shadow-sm flex items-center justify-center mb-4 transition-transform duration-300 group-hover/image:scale-110 group-hover/image:bg-primary group-hover/image:text-primary-foreground border-2 border-dashed border-primary/20 group-hover/image:border-transparent">
+                          <ImageIcon className="w-7 h-7" />
+                        </div>
                         <Button
                           size="sm"
-                          variant="secondary"
+                          className="rounded-full shadow-md gap-2 font-bold w-full bg-foreground text-background hover:bg-primary hover:text-primary-foreground transition-all"
                           onClick={() =>
                             handleGeneratePoster(
                               index,
@@ -437,9 +462,12 @@ export function ContentPlanTab({
                             )
                           }
                         >
-                          <Sparkles className="w-3 h-3 mr-1" />
+                          <Sparkles className="w-4 h-4" />
                           Generate Poster
                         </Button>
+                        <p className="text-[10px] uppercase font-bold tracking-widest mt-4 opacity-50">
+                          1 Kredit DeAPI
+                        </p>
                       </>
                     )}
                   </div>
@@ -447,35 +475,37 @@ export function ContentPlanTab({
               </div>
 
               {/* Caption */}
-              <div className="flex-1">
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                  Caption
+              <div className="flex-1 flex flex-col gap-2 relative">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                  Ide Caption
                 </label>
-                <Textarea
-                  value={getCaption(index, day.caption)}
-                  onChange={(e) => handleCaptionChange(index, e.target.value)}
-                  className="min-h-25 text-sm resize-none"
-                />
+                <div className="relative group/textarea h-full min-h-[140px]">
+                  <Textarea
+                    value={getCaption(index, day.caption)}
+                    onChange={(e) => handleCaptionChange(index, e.target.value)}
+                    className="absolute inset-0 h-full text-sm resize-none bg-background/50 border-border/50 rounded-xl focus-visible:ring-primary/20 transition-all focus-visible:border-primary/50 shadow-inner group-hover/textarea:border-border/80 leading-relaxed font-medium"
+                  />
+                </div>
               </div>
 
               {/* Hashtags */}
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                  Hashtags
-                </label>
-                <div className="flex flex-wrap gap-1">
-                  {day.hashtag.slice(0, 4).map((tag, tagIndex) => (
+              <div className="mt-auto">
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {day.hashtag.slice(0, 5).map((tag, tagIndex) => (
                     <Badge
                       key={tagIndex}
                       variant="secondary"
-                      className="text-xs font-normal"
+                      className="text-[10px] font-semibold bg-primary/10 text-primary border-0 hover:bg-primary/20 px-2 py-0.5 rounded-md"
                     >
                       {tag}
                     </Badge>
                   ))}
-                  {day.hashtag.length > 4 && (
-                    <Badge variant="outline" className="text-xs">
-                      +{day.hashtag.length - 4}
+                  {day.hashtag.length > 5 && (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] font-bold border-muted-foreground/30 text-muted-foreground  px-2 py-0.5 rounded-md"
+                    >
+                      +{day.hashtag.length - 5}
                     </Badge>
                   )}
                 </div>

@@ -22,15 +22,20 @@ import {
   Eye,
   Loader2,
   ImageIcon,
+  Search,
 } from "lucide-react";
 import type { HistoryRecord } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 
 interface HistoryListProps {
   onSelectHistory: (history: HistoryRecord) => void;
+  searchQuery?: string;
 }
 
-export function HistoryList({ onSelectHistory }: HistoryListProps) {
+export function HistoryList({
+  onSelectHistory,
+  searchQuery = "",
+}: HistoryListProps) {
   const [histories, setHistories] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -103,7 +108,7 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("id-ID", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
@@ -112,27 +117,64 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="flex flex-col items-center justify-center py-24 space-y-4 animate-in fade-in duration-700">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 border-4 border-muted rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <p className="text-muted-foreground font-medium animate-pulse">
+          Memuat riwayat generasi...
+        </p>
       </div>
     );
   }
 
   if (histories.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Belum Ada Riwayat</h3>
-        <p className="text-muted-foreground">
-          Generate produk pertama Anda untuk melihat riwayat
+      <div className="text-center py-24 animate-in zoom-in-95 duration-700 bg-muted/20 border border-border/50 rounded-[2rem]">
+        <div className="w-24 h-24 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-6 shadow-inner">
+          <Package className="w-10 h-10 text-primary" />
+        </div>
+        <h3 className="text-2xl font-bold tracking-tight mb-3">
+          Belum Ada Riwayat
+        </h3>
+        <p className="text-muted-foreground text-lg max-w-md mx-auto">
+          Mulai generate strategi produk pertama Anda dan saksikan riwayatnya
+          tersimpan secara otomatis di sini.
+        </p>
+      </div>
+    );
+  }
+
+  const filteredHistories = histories.filter((h) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      h.product_info.toLowerCase().includes(query) ||
+      h.result.nama_produk?.toLowerCase().includes(query) ||
+      h.result.kategori_produk?.toLowerCase().includes(query)
+    );
+  });
+
+  if (filteredHistories.length === 0 && histories.length > 0) {
+    return (
+      <div className="text-center py-24 animate-in zoom-in-95 duration-700 bg-muted/20 border border-border/50 rounded-[2rem]">
+        <div className="w-24 h-24 mx-auto bg-muted/50 rounded-full flex items-center justify-center mb-6 shadow-inner border border-border/50">
+          <Search className="w-10 h-10 text-muted-foreground" />
+        </div>
+        <h3 className="text-2xl font-bold tracking-tight mb-3">
+          Tidak Ditemukan
+        </h3>
+        <p className="text-muted-foreground text-lg max-w-md mx-auto">
+          Tidak ada riwayat produk yang cocok dengan pencarian "{searchQuery}"
         </p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {histories.map((history) => {
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in duration-700">
+      {filteredHistories.map((history) => {
         const posterCount = history.generated_images
           ? Object.keys(history.generated_images).length
           : 0;
@@ -140,73 +182,86 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
         return (
           <Card
             key={history.id}
-            className="cursor-pointer hover:border-primary transition-colors"
+            className="cursor-pointer group hover:-translate-y-1.5 transition-all duration-300 border-0 shadow-lg bg-card rounded-[2rem] overflow-hidden relative"
             onClick={() => onSelectHistory(history)}
           >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1">
-                  <CardTitle className="text-sm line-clamp-2 mb-2">
-                    {history.product_info.substring(0, 60)}
-                    {history.product_info.length > 60 && "..."}
-                  </CardTitle>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
-                    {formatDate(history.created_at)}
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {/* Product Image */}
-              <div className="aspect-video rounded-lg bg-muted overflow-hidden">
+            <div className="absolute inset-x-0 -top-full h-full bg-gradient-to-b from-primary/5 to-transparent transition-all duration-500 ease-out group-hover:top-0 pointer-events-none" />
+
+            <CardContent className="p-0 relative z-10">
+              {/* Product Image Banner */}
+              <div className="aspect-video w-full bg-muted/50 overflow-hidden relative border-b border-border/50">
                 <img
                   src={history.product_image}
                   alt="Product"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <p className="text-white font-bold truncate text-lg drop-shadow-md">
+                    Buka Hasil Analisis
+                  </p>
+                </div>
 
-              {/* Info */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge
-                    variant="secondary"
-                    className="text-xs break-words whitespace-normal text-left"
-                  >
-                    {history.result.kategori_produk}
-                  </Badge>
-                  {posterCount > 0 && (
-                    <Badge variant="outline" className="text-xs gap-1">
-                      <ImageIcon className="w-3 h-3" />
-                      {posterCount}
-                    </Badge>
-                  )}
+                {/* Floating Date Badge */}
+                <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-border/50 flex items-center gap-2 shadow-lg">
+                  <Calendar className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-xs font-bold text-foreground">
+                    {formatDate(history.created_at)}
+                  </span>
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => onSelectHistory(history)}
-                >
-                  <Eye className="w-3 h-3 mr-1" />
-                  Lihat
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => openDeleteDialog(history.id, e)}
-                  disabled={deletingId === history.id}
-                >
-                  {deletingId === history.id ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                  ) : (
-                    <Trash2 className="w-3 h-3" />
+              {/* Info section */}
+              <div className="p-6 space-y-4 bg-gradient-to-b from-transparent to-muted/10">
+                <CardTitle className="text-base font-extrabold line-clamp-2 leading-tight min-h-[40px] group-hover:text-primary transition-colors duration-300">
+                  {history.product_info}
+                </CardTitle>
+
+                <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] font-bold uppercase tracking-widest bg-primary/10 text-primary truncate max-w-[120px] px-2.5 py-1 border-0 rounded-lg"
+                  >
+                    {history.result.kategori_produk}
+                  </Badge>
+
+                  {posterCount > 0 && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-bold gap-1.5 px-2.5 py-1 border-border/80 shadow-inner bg-background rounded-lg"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5 text-amber-500" />
+                      {posterCount} AI
+                    </Badge>
                   )}
-                </Button>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    size="sm"
+                    className="flex-1 rounded-xl font-bold bg-foreground text-background hover:bg-primary gap-2 transition-all shadow-md group-hover:shadow-primary/20"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectHistory(history);
+                    }}
+                  >
+                    <Eye className="w-4 h-4" />
+                    Lihat
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="rounded-xl border-border/80 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-colors shrink-0"
+                    onClick={(e) => openDeleteDialog(history.id, e)}
+                    disabled={deletingId === history.id}
+                  >
+                    {deletingId === history.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -214,21 +269,26 @@ export function HistoryList({ onSelectHistory }: HistoryListProps) {
       })}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-[2rem] p-8 border-0 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Riwayat?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Riwayat dan semua poster yang
-              telah di-generate akan dihapus secara permanen.
+            <AlertDialogTitle className="text-2xl font-black">
+              Hapus Riwayat Generate?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base font-medium text-muted-foreground/80 leading-relaxed">
+              Tindakan ini permanen. Seluruh data analisis, strategi, ide
+              konten, dan poster yang telah di-generate akan ikut terhapus dari
+              sistem.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+          <AlertDialogFooter className="mt-6">
+            <AlertDialogCancel className="rounded-xl font-bold border-0 bg-muted hover:bg-muted/80">
+              Batal
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="rounded-xl font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-lg shadow-destructive/20"
             >
-              Hapus
+              Ya, Hapus Permanen
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
