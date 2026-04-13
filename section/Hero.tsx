@@ -53,7 +53,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="container relative z-10 mx-auto px-6 text-center">
+      <div className="container relative z-10 mx-auto px-6 text-center pt-8">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-[#DDE7FF] mb-6">
           <span className="text-sm font-semibold text-[#3B66D1]">Solusi cerdas untuk UMKM</span>
@@ -72,7 +72,7 @@ export default function Hero() {
         </p>
 
         {/* CTA Button */}
-        <div className="flex justify-center mb-10">
+        <div className="flex justify-center -mb-28">
           <Link href="/workspace">
             <Button size="lg" className="h-14 px-8 rounded-2xl bg-[#B87CFF] hover:bg-[#A666FF] text-white font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
               Mulai sekarang <ArrowUpRight className="w-6 h-6" />
