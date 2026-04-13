@@ -37,7 +37,7 @@ async function generateWithFallback(
   mimeType: string,
   prompt: string,
 ) {
-  const models = ["gemini-2.5-flash", "gemini-2.5-flash-preview-09-2025"];
+  const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
 
   for (let i = 0; i < models.length; i++) {
     try {
