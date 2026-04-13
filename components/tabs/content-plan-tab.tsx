@@ -82,13 +82,23 @@ export function ContentPlanTab({
     return editedCaptions[index] ?? originalCaption;
   };
 
-  const handleGeneratePoster = async (index: number, caption: string) => {
+  const buildPosterPrompt = (caption: string, hashtags: string[] = []) => {
+    const hashtagContext = hashtags.join(" ");
+
+    return `Buat poster promosi makanan untuk UMKM berdasarkan caption ini: "${caption}". Fokuskan visual pada makanan utama yang sesuai caption, dengan detail tekstur dan plating yang realistis. Gunakan gaya komersial modern, bersih, dan menarik untuk sosial media. Konteks hashtag: ${hashtagContext || "-"}.`;
+  };
+
+  const handleGeneratePoster = async (
+    index: number,
+    caption: string,
+    hashtags: string[] = [],
+  ) => {
     setGeneratingIndex(index);
     try {
       const { data: sessionData } = (await supabase?.auth.getSession()) || {};
       const token = sessionData?.session?.access_token;
 
-      const prompt = `Professional social media poster design for: ${caption}. Modern, vibrant, eye-catching design with clear text and attractive visuals`;
+      const prompt = buildPosterPrompt(caption, hashtags);
 
       const response = await fetch("/api/generate-poster", {
         method: "POST",
@@ -98,6 +108,8 @@ export function ContentPlanTab({
         },
         body: JSON.stringify({
           prompt,
+          caption,
+          hashtags,
           width: 768,
           height: 768,
           steps: 8,
@@ -117,7 +129,7 @@ export function ContentPlanTab({
       } else {
         throw new Error("No image URL received from API");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error generating poster:", error);
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -157,7 +169,8 @@ export function ContentPlanTab({
         const token = sessionData?.session?.access_token;
 
         const caption = getCaption(i, contentPlan[i].caption);
-        const prompt = `Professional social media poster design for: ${caption}. Modern, vibrant, eye-catching design with clear text and attractive visuals`;
+        const hashtags = contentPlan[i].hashtag;
+        const prompt = buildPosterPrompt(caption, hashtags);
 
         const response = await fetch("/api/generate-poster", {
           method: "POST",
@@ -167,6 +180,8 @@ export function ContentPlanTab({
           },
           body: JSON.stringify({
             prompt,
+            caption,
+            hashtags,
             width: 768,
             height: 768,
             steps: 8,
@@ -187,7 +202,7 @@ export function ContentPlanTab({
         } else {
           throw new Error("No image URL received from API");
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(`Error generating poster ${i + 1}:`, error);
         failCount++;
 
@@ -420,6 +435,7 @@ export function ContentPlanTab({
                           handleGeneratePoster(
                             index,
                             getCaption(index, day.caption),
+                            day.hashtag,
                           )
                         }
                         disabled={generatingIndex === index}
@@ -459,6 +475,7 @@ export function ContentPlanTab({
                             handleGeneratePoster(
                               index,
                               getCaption(index, day.caption),
+                              day.hashtag,
                             )
                           }
                         >
